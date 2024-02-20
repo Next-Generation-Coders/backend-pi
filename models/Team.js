@@ -9,7 +9,6 @@ const Team = new Schema({
     logo : String,
     players : [User],
     coach : User,
-    staff : [User],
     matches : [Match]
     
 })

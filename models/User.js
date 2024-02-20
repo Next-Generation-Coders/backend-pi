@@ -21,7 +21,6 @@ const User = new Schema({
         enum : Object.values(Role),
         default : Role.USER
     }]
-    
 })
 
 module.exports = mongo.model('user',User);
