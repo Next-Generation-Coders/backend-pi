@@ -15,9 +15,14 @@ const Match = new Schema({
     endDay : Number,
     endMonth : Number,
     endYear : Number,
-    result : Result,
-    tournament : Tournament
-    
+    result : {
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'MatchResult'
+    },
+    tournament: {
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'Tournament'
+    }    
 })
 
 module.exports = mongo.model('match',Match);
