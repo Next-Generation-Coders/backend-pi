@@ -1,10 +1,12 @@
 const mongo = require('mongoose');
 const Team = require('./Team');
+const Result = require('./Result');
 const Tournament = require('./Tournament');
 
 const Schema = mongo.Schema
 
 const Match = new Schema({
+    
     team1 : Team,
     team2 : Team,
     startDay : Number,
@@ -14,10 +16,13 @@ const Match = new Schema({
     endMonth : Number,
     endYear : Number,
     result : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Result'
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'MatchResult'
     },
-    tournament : Tournament
+    tournament: {
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'Tournament'
+    }    
 })
 
 module.exports = mongo.model('match',Match);
