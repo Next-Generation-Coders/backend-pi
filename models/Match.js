@@ -1,10 +1,8 @@
 const mongo = require('mongoose');
 const Team = require('./Team');
-const Result = require('./Result');
-const Tournament = require('./Tournament');
 
 const Schema = mongo.Schema
-
+//
 const Match = new Schema({
     
     team1 : Team,
