@@ -15,7 +15,7 @@ const Match = new Schema({
     endYear : Number,
     result : {
         type: mongo.Schema.Types.ObjectId,
-        ref: 'MatchResult'
+        ref: 'result'
     },
     tournament: {
         type: mongo.Schema.Types.ObjectId,
