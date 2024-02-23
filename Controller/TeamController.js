@@ -27,7 +27,7 @@ async function getall (req,res){
 
 async function getbyid (req,res){
     try{
-        const data = await Team.findById(req.params.id)
+        const data = await Team.findById(req.params.id).populate('players')
         res.status(200).send(data)
 
 

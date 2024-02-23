@@ -18,7 +18,7 @@ const TournamentSchema = new Schema({
     }],
     matches: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Match'
+        ref: 'match'
     }]
 });
 
