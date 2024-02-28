@@ -1,5 +1,7 @@
 //je change le nom de l'entité ici et partout
 const Tournament = require('../models/Tournament')
+const Team = require('../models/Team');
+const Match = require('../models/Match');
 
 async function add (req,res){
     console.log(req.body)
@@ -76,4 +78,55 @@ async function deleteTournament (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTournament}
+
+
+
+async function generateRoundRobinSchedule(req,res) {
+    try {
+        const tournament = await Tournament.findById(req.params.id).populate('teams');
+        if (!tournament) {
+            throw new Error("Tournament not found");
+        }
+
+        const teams = tournament.teams;
+        const numTeams = teams.length;
+        const schedule = [];
+
+        if (numTeams % 2 !== 0) {
+            teams.push(new Team({ name: "Dummy Team" }));
+        }
+
+        const numRounds = numTeams - 1;
+        const halfNumTeams = numTeams / 2;
+
+        for (let round = 1; round <= numRounds; round++) {
+            const roundSchedule = [];
+            for (let i = 0; i < halfNumTeams; i++) {
+                const match = new Match({
+                    team1: teams[i],
+                    team2: teams[numTeams - 1 - i],
+                    round: round,
+                    tournament:req.params.id
+                });
+                await match.save();
+                roundSchedule.push(match);
+            }
+            schedule.push(roundSchedule);
+
+            // Rotate teams in the array for the next round
+            teams.splice(1, 0, teams.pop());
+
+        tournament.matches = roundSchedule.flat();
+        await tournament.save();
+        }
+
+        
+        console.log(schedule)
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
+module.exports={add,getall,getbyid,getbyname,update,deleteTournament,generateRoundRobinSchedule}

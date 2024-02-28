@@ -24,6 +24,9 @@ app.use("/Tournament", TournamentRouter);
 const TeamRouter = require("./routes/Team");
 app.use("/Team", TeamRouter);
 
+const MatchRouter = require("./routes/Match");
+app.use("/Match", MatchRouter);
+
 // Server setup
 const PORT = 3000;
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

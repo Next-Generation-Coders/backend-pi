@@ -1,6 +1,6 @@
-const mongo = require('mongoose');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const Schema = mongo.Schema
 
 const Role = {
     COACH: 'COACH',
@@ -20,7 +20,21 @@ const User = new Schema({
         type : String,
         enum : Object.values(Role),
         default : Role.USER
-    }]
+    }],
+    //teams to show player previous team // Coach also maybe
+    teams: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'
+    }],
+    // games played by coach and player 
+    games:Number , 
+    // rating of player or coach 
+    rate:Number ,
+    // for player 
+    position:String ,
+    jersyNumber:Number ,
+    value:String //parseFloat to chnage it to float 
+
 })
 
-module.exports = mongo.model('user',User);
+module.exports = mongoose.model('user',User);

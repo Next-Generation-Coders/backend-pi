@@ -14,7 +14,7 @@ async function add (req,res){
 
 async function getall (req,res){
     try{
-        const data = await Match.find()
+        const data = await Match.find().populate('team1' ).populate('team2' )
         res.status(200).send(data)
 
     }catch(err){

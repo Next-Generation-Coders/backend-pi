@@ -17,6 +17,8 @@ router.put('/update/:id',TeamController.update);
 
 router.delete('/delete/:id',TeamController.deleteTeam);
 
+router.post('/addPlayer/:id',TeamController.addPlayerToTeam);
+
 module.exports = router;
 
 
