@@ -1,17 +1,15 @@
 const mongo = require('mongoose');
 const Team = require('./Team');
-const Result = require('./Result');
-const Tournament = require('./Tournament');
 
 const Schema = mongo.Schema
-
+//
 const Match = new Schema({
     
-    team1 :  {
+    team1 : {
         type: mongo.Schema.Types.ObjectId,
         ref: 'Team'
     },
-    team2 :  {
+    team2 : {
         type: mongo.Schema.Types.ObjectId,
         ref: 'Team'
     },
@@ -33,7 +31,7 @@ const Match = new Schema({
     referee: [{
         type: mongo.Schema.Types.ObjectId,
         ref: 'user'
-    }],  
+    }],   
 })
 
 module.exports = mongo.model('match',Match);

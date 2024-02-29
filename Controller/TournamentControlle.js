@@ -45,10 +45,7 @@ async function getbyname (req,res){
         res.status(200).send(data)
     }catch(err){
         res.status(400).json({error:err});
-
-
     }
-
 }
 
 
@@ -77,9 +74,6 @@ async function deleteTournament (req,res){
     }
 
 }
-
-
-
 
 async function generateRoundRobinSchedule(req,res) {
     try {

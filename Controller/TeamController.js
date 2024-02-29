@@ -1,8 +1,7 @@
 //je change le nom de l'entité ici et partout
 const Team = require('../models/Team');
 const User = require('../models/User');
-const Coach=require('../models/User')
-
+const Coach=require('../models/User');
 async function add (req,res){
     console.log(req.body)
     try{
@@ -84,14 +83,10 @@ async function deleteTeam (req,res){
 
 }
 
-
-
 async function addPlayerToTeam(req, res) {
     try {
-        // Find the coach by ID
         const coach = await Coach.findById(req.params.id);
         
-        // Check if the coach exists and has the role of COACH
         if (coach && coach.role == "COACH") {
             // Check if the player already exists in the database
             const existingPlayer = await User.findOne({ email: req.body.email });

@@ -1,17 +1,27 @@
 const express=require("express")
 const router=express.Router()
 const UserController=require('../Controller/UserController')
+const tokenVerif = require('../middlewares/tokenVerification')
 
+//Auth
+router.post('/signup',UserController.signupUser);
 
+router.post('/login',UserController.loginUser);
 
+router.put('/verify',UserController.verifyEmail);
 
+router.put('/reset',UserController.resetPassword);
+
+router.get('/roles',UserController.checkRoles)
+
+//CRUD
 router.post('/add',UserController.add);
 
-router.get('/getall',UserController.getall);
+router.get('/getall',tokenVerif.requireAuth,UserController.getall);
 
-router.get('/getbyid/:id',UserController.getbyid);
+router.get('/getbyid/:id',tokenVerif.requireAdmin,UserController.getbyid);
 
-router.get('/getbyname/:name',UserController.getbyname);
+router.get('/getbyname/:name',tokenVerif.requireCoachAndPlayer,UserController.getbyname);
 
 router.put('/update/:id',UserController.update);
 
