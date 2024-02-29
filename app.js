@@ -5,15 +5,15 @@ const Bodyparser = require('body-parser');
 const mongo = require("mongoose");
 const app = express();
 const server = http.createServer(app);
-const allowedOrigin = 'http://localhost:5173';
 const config = require('./config/dbconfig.json');
-const db = require('./config/dbcon');
 const Tournament = require('./models/Tournament');
+const cookieParser = require('cookie-parser')
 
 // Middleware
 app.use(Bodyparser.json());
 app.use(cors());
-
+app.use(cookieParser())
+require('dotenv').config()
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
