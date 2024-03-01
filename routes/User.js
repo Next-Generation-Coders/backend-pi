@@ -14,10 +14,15 @@ router.put('/reset',UserController.resetPassword);
 
 router.get('/roles',UserController.checkRoles)
 
+router.post('/refresh',UserController.refresh)
+
+router.put('/toggleBlock',tokenVerif.requireAdmin,UserController.toggleBlockUser)
+
+
 //CRUD
 router.post('/add',UserController.add);
 
-router.get('/getall',tokenVerif.requireAuth,UserController.getall);
+router.get('/getall',tokenVerif.requireAdmin,UserController.getall);
 
 router.get('/getbyid/:id',tokenVerif.requireAdmin,UserController.getbyid);
 

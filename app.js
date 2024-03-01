@@ -8,6 +8,9 @@ const server = http.createServer(app);
 const config = require('./config/dbconfig.json');
 const Tournament = require('./models/Tournament');
 const cookieParser = require('cookie-parser')
+const passport = require("passport");
+const googleAuth = require("./routes/index");
+const session = require("express-session");
 
 // Middleware
 app.use(Bodyparser.json());
@@ -15,6 +18,25 @@ app.use(cors());
 app.use(cookieParser())
 require('dotenv').config()
 // Routes
+
+//session
+app.use(
+    session({
+        secret: "secret",
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
+//morgan
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(passport.initialize());
+require("./auth/google-auth")(passport);
+
+app.use("/", googleAuth);
+
+
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
 

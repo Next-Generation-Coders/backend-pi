@@ -17,14 +17,18 @@ const loginUser = async (req, res) => {
 
         const accessToken = jwt.sign(
             {
-                "user": user._id._id
+                "id": user._id,
+                "user": user.email
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
         )
 
         const refreshToken = jwt.sign(
-            { "user": user._id._id },
+            {
+                "id": user._id,
+                "user":user.email
+            },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         )
@@ -46,7 +50,7 @@ const loginUser = async (req, res) => {
             });
         }
         // Send accessToken containing username and roles
-        res.json({ accessToken })
+        res.json({ accessToken, email: user.email, fullname: user.fullname,roles:user.roles})
     } catch (error) {
         res.status(400).json({error: error.message})
     }
@@ -64,7 +68,8 @@ const signupUser = async (req, res) => {
 
         const accessToken = jwt.sign(
             {
-                "user": user._id
+                "id": user._id,
+                "user":user.email
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
@@ -72,7 +77,10 @@ const signupUser = async (req, res) => {
 
         // Create a refresh token
         const refreshToken = jwt.sign(
-            { "user": user._id },
+            {
+                "id": user._id,
+                "user":user.email
+            },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         )
@@ -100,7 +108,7 @@ const signupUser = async (req, res) => {
 const refresh = (req, res) => {
     const cookies = req.cookies
 
-    if (!cookies?.jwt) return res.status(401).json({ message: 'Unauthorized' })
+    if (!cookies?.jwt) return res.status(401).json({ message: 'You need to login' })
 
     const refreshToken = cookies.jwt
 
@@ -110,22 +118,22 @@ const refresh = (req, res) => {
         asyncHandler(async (err, decoded) => {
             if (err) return res.status(403).json({ message: 'Forbidden' })
 
-            const foundUser = await User.findOne({ username: decoded.username }).exec()
+            const user = await User.findById(decoded.id).exec()
 
-            if (!foundUser) return res.status(401).json({ message: 'Unauthorized' })
+            if (!user) return res.status(401).json({ message: 'Unauthorized' })
 
             const accessToken = jwt.sign(
                 {
-                    "user": {
-                        "username": foundUser.username,
-                        "roles": foundUser.roles
+                    "id": {
+                        "id": user._id,
+                        "user": user.email
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '15m' }
             )
 
-            res.json({ accessToken })
+            res.json({ accessToken, email: user.email, fullname: user.fullname})
         })
     )
 }
@@ -192,11 +200,31 @@ const resetPassword = async (req,res)=>{
             subject: "Reset password request",
             html: "<p>Your password has been reset to: </p><b>"+password+"</b>",
         });
-        res.status(200).json({user:user})
+        res.status(200).json({message:"Password reset is sent to "+Email})
     } catch (error) {
         res.status(400).json({error: error.message})
     }
 }
+
+async function toggleBlockUser(req,res){
+    try{
+        const {_id} = req.body.id;
+
+        const userToBlock = await User.findById(_id);
+
+        userToBlock.isBlocked = !userToBlock.isBlocked;
+
+        await User.findByIdAndUpdate(userToBlock._id,userToBlock);
+
+        res.status(200).json({message:"Updated user status successfully!"})
+    }catch(e){
+        res.status(401).json({error:e.message})
+    }
+}
+
+
+
+
 
 //                  ===================== CRUD ======================
 
@@ -274,4 +302,4 @@ async function deleteUser (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles}
+module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser}
