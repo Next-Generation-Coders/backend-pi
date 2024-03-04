@@ -5,7 +5,9 @@ const mailer = require('../config/nodemailer');
 const bcrypt = require("bcrypt");
 const asyncHandler = require('express-async-handler')
 
-//                  ================= Auth ==================
+//                  =================================================
+//                  ===================== AUTH ======================
+//                  =================================================
 
 // login a user
 const loginUser = async (req, res) => {
@@ -17,8 +19,7 @@ const loginUser = async (req, res) => {
 
         const accessToken = jwt.sign(
             {
-                "id": user._id,
-                "user": user.email
+                "_id": user._id
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
@@ -26,8 +27,7 @@ const loginUser = async (req, res) => {
 
         const refreshToken = jwt.sign(
             {
-                "id": user._id,
-                "user":user.email
+                "_id": user._id
             },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
@@ -50,7 +50,17 @@ const loginUser = async (req, res) => {
             });
         }
         // Send accessToken containing username and roles
-        res.json({ accessToken, email: user.email, fullname: user.fullname,roles:user.roles})
+        res.json({ accessToken, user:{
+                email: user.email,
+                fullname: user.fullname,
+                roles:user.roles,
+                phone:user.phone,
+                city:user.city,
+                country:user.country,
+                isBlocked:user.isBlocked,
+                isVerified:user.isVerified,
+                age:user.age,
+            }})
     } catch (error) {
         res.status(400).json({error: error.message})
     }
@@ -68,8 +78,7 @@ const signupUser = async (req, res) => {
 
         const accessToken = jwt.sign(
             {
-                "id": user._id,
-                "user":user.email
+                "_id": user._id
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
@@ -78,8 +87,7 @@ const signupUser = async (req, res) => {
         // Create a refresh token
         const refreshToken = jwt.sign(
             {
-                "id": user._id,
-                "user":user.email
+                "_id": user._id
             },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
@@ -99,7 +107,17 @@ const signupUser = async (req, res) => {
             html: "<b>Hello, confirm please</b>",
         });
 
-        res.status(200).json({accessToken})
+        res.status(200).json({accessToken, user:{
+            email: user.email,
+                fullname: user.fullname,
+                roles:user.roles,
+                phone:user.phone,
+                city:user.city,
+                country:user.country,
+                isBlocked:user.isBlocked,
+                isVerified:user.isVerified,
+                age:user.age,
+        }})
     } catch (error) {
         res.status(400).json({error: error.message})
     }
@@ -124,16 +142,23 @@ const refresh = (req, res) => {
 
             const accessToken = jwt.sign(
                 {
-                    "id": {
-                        "id": user._id,
-                        "user": user.email
-                    }
+                    "_id": user._id
                 },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '15m' }
             )
 
-            res.json({ accessToken, email: user.email, fullname: user.fullname})
+            res.json({ accessToken},{ user:{
+                        email: user.email,
+                        fullname: user.fullname,
+                        roles:user.roles,
+                        phone:user.phone,
+                        city:user.city,
+                        country:user.country,
+                        isBlocked:user.isBlocked,
+                        isVerified:user.isVerified,
+                        age:user.age,
+                    }})
         })
     )
 }
@@ -174,6 +199,23 @@ const verifyEmail = async (req,res)=>{
 
 }
 
+const changePassword = async (req,res)=>{
+    try{
+        const {currentPassword,newPassword} = req.body;
+        const match = await bcrypt.compare(currentPassword,req.user.password)
+        if(!match){
+            res.status(401).json({error:"Old password is incorrect!"})
+        }
+        if(match){
+            const salt = await bcrypt.genSalt(10)
+            req.user.password = await bcrypt.hash(newPassword, salt);
+            await User.findByIdAndUpdate(req.user._id,req.user);
+            res.status(200).json('Password changed successfully!')
+        }
+    }catch(e){
+        res.status(401).json({error:e.message})
+    }
+}
 
 const resetPassword = async (req,res)=>{
     let Email = req.body.email
@@ -224,9 +266,109 @@ async function toggleBlockUser(req,res){
 
 
 
+async function updateUserProfile(req,res){
+    try{
+        const usr = req.body.user;
+        const u = await User.findOne({email : usr.email})
+        u.fullname =  usr.fullname;
+        u.phone = usr.phone;
+        u.age = usr.age;
+        u.city = usr.city;
+        u.country = usr.country;
+        const accessToken = jwt.sign(
+            {
+                "_id": u._id
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        )
+
+        // Create a refresh token
+        const refreshToken = jwt.sign(
+            {
+                "_id": u._id
+            },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' }
+        )
+        res.cookie('jwt', refreshToken, {
+            sameSite: 'None',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+        await User.findByIdAndUpdate(u._id,u);
+        const user = await User.findById(u._id)
+            res.status(200).json({accessToken:accessToken,user:{
+                email: user.email,
+                fullname: user.fullname,
+                roles:user.roles,
+                phone:user.phone,
+                city:user.city,
+                country:user.country,
+                isBlocked:user.isBlocked,
+                isVerified:user.isVerified,
+                age:user.age,
+            }});
+
+    }catch(err){
+        res.status(401).json({error : err.message})
+    }
+}
+
+async function getUserByEmail (req,res){
+    try{
+        const email = req.params.email;
+
+        const user = await User.findOne({email});
+        const accessToken = jwt.sign(
+            {
+                "_id": user._id
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        )
+
+        // Create a refresh token
+        const refreshToken = jwt.sign(
+            {
+                "_id": user._id
+            },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' }
+        )
+
+        // Create cookie with refresh token
+        res.cookie('jwt', refreshToken, {
+            sameSite: 'None',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+        res.status(200).json({accessToken:accessToken,user:{
+                email: user.email,
+                fullname: user.fullname,
+                roles:user.roles,
+                phone:user.phone,
+                city:user.city,
+                country:user.country,
+                isBlocked:user.isBlocked,
+                isVerified:user.isVerified,
+                age:user.age,
+            }});
+    }catch(e){
+        res.status(401).json({error : e.message})
+    }
+
+}
 
 
+
+
+
+
+
+
+//                  =================================================
 //                  ===================== CRUD ======================
+//                  =================================================
+
 
 async function add(req, res) {
     try {
@@ -302,4 +444,4 @@ async function deleteUser (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser}
+module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser,updateUserProfile,getUserByEmail,changePassword}

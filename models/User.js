@@ -49,7 +49,15 @@ const User = new Schema({
     value:String,
     secret:String,
     googleId:String,
-    pic:String
+    pic:String,
+    country:{
+        label:String,
+        value:String,
+    },
+    city:{
+        label:String,
+        value:String,
+    }
 
 })
 

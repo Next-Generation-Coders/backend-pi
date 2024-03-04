@@ -16,7 +16,13 @@ router.get('/roles',UserController.checkRoles)
 
 router.post('/refresh',UserController.refresh)
 
-router.put('/toggleBlock',tokenVerif.requireAdmin,UserController.toggleBlockUser)
+router.put('/toggle-block',tokenVerif.requireAdmin,UserController.toggleBlockUser)
+
+router.put('/profile',tokenVerif.requireAuth,UserController.updateUserProfile)
+
+router.put('/change-password',tokenVerif.requireAuth,UserController.changePassword)
+
+router.get('/email/:email',UserController.getUserByEmail)
 
 
 //CRUD
