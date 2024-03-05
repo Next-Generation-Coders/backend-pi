@@ -27,6 +27,10 @@ router.put('/update/:id',UserController.update);
 
 router.delete('/delete/:id',UserController.deleteUser);
 
+router.get('/getallPlayers',UserController.getallPlayers);
+
+router.get('/getbyemail', UserController.getByEmail);
+
 module.exports = router;
 
 

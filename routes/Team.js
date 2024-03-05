@@ -5,7 +5,7 @@ const TeamController=require('../Controller/TeamController')
 
 
 
-router.post('/add',TeamController.add);
+router.post('/add/:id',TeamController.add);
 
 router.get('/getall',TeamController.getall);
 
@@ -18,6 +18,12 @@ router.put('/update/:id',TeamController.update);
 router.delete('/delete/:id',TeamController.deleteTeam);
 
 router.post('/addPlayer/:id',TeamController.addPlayerToTeam);
+
+router.get('/checkCoach/:id',TeamController.checkCoach);
+
+router.put('/updateXTeam/:id',TeamController.updateXTeam);
+
+router.get('/getTeambyCoach/:id',TeamController.getTeambyCoach);
 
 module.exports = router;
 

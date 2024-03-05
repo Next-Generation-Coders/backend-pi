@@ -7,13 +7,13 @@ const app = express();
 const server = http.createServer(app);
 const config = require('./config/dbconfig.json');
 const Tournament = require('./models/Tournament');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser') ;
 
 // Middleware
 app.use(Bodyparser.json());
 app.use(cors());
 app.use(cookieParser())
-require('dotenv').config()
+require('dotenv').config() 
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
