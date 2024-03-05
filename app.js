@@ -1,24 +1,31 @@
 const express = require("express")
 const http = require("http")
 const cors = require('cors');
-var app = express()
 const Bodyparser=require('body-parser')
 const mongo= require ("mongoose")
-const server = http.createServer(app)
 const allowedOrigin = 'http://localhost:5173';
 const config=require ('./config/dbconfig.json')
-app.use(Bodyparser.json())
+mongo.connect(config.url ,{
+  useUnifiedTopology:true,
+  useNewUrlParser:true,
+}).then (()=> console.log("database connected")).catch(()=>console.log("error with db connection "));
+
 const db = require('./config/dbcon');
 const Tournament = require('./models/Tournament');
 const ResultRouter=require("./routes/ResultRoute");
-app.use("/api",ResultRouter);
-const socketIo = require('socket.io');
-
-const  io = socketIo(server);
-
-
+const Result = require('./models/Result')
+var app = express()
 app.use(cors());
-io.on('connection', (socket) => {
+
+app.use(Bodyparser.json())
+
+app.use("/api",ResultRouter);
+const server=http.createServer(app);
+const io=require("socket.io")(server);
+
+
+
+io.on("connection", (socket) => {
   console.log('Client connected');
 
   socket.on('goal', async ({ team }) => {
@@ -52,10 +59,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3000,console.log("server is running"))
-  mongo.connect(config.url ,{
-      useUnifiedTopology:true,
-      useNewUrlParser:true,
-  }).then (()=> console.log("database connected")).catch(()=>console.log("error with db connection "));
-
+server.listen(3001,console.log("server is running"))
+ 
 module.exports =app
