@@ -4,7 +4,10 @@ const User = require('./User');
 const Match = require('./Match');
 
 const TeamSchema = new Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true
+      },
     logo: String,
     players: [{
         type: mongoose.Schema.Types.ObjectId,
