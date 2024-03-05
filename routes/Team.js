@@ -2,10 +2,10 @@ const express=require("express")
 const router=express.Router()
 const TeamController=require('../Controller/TeamController')
 
-const requireAuth = require('../middlewares/tokenVerification');
 
 
-router.post('/add',TeamController.add);
+
+router.post('/add/:id',TeamController.add);
 
 router.get('/getall',TeamController.getall);
 
@@ -19,7 +19,10 @@ router.delete('/delete/:id',TeamController.deleteTeam);
 
 router.post('/addPlayer/:id',TeamController.addPlayerToTeam);
 
+router.get('/checkCoach/:id',TeamController.checkCoach);
+
+router.put('/updateXTeam/:id',TeamController.updateXTeam);
+
+router.get('/getTeambyCoach/:id',TeamController.getTeambyCoach);
+
 module.exports = router;
-
-
-

@@ -274,4 +274,45 @@ async function deleteUser (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles}
+
+async function getallPlayers(req, res) {
+    try {
+        const data = await User.find({ role: 'PLAYER' });
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
+
+async function getPlayersByIds(playerIds) {
+    try {
+        const players = await User.find({ _id: { $in: playerIds } });
+        return players.map(player => `${player.fullname} (${player.position})`); // Assuming the player name field is "fullname"
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+async function getByEmail (req, res)  {
+    const { email } = req.query;
+    console.log(email);
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Return the user details without sensitive information (e.g., password)
+        const { _id, fullname, age, phone, roles, teams, games, rate, position, jersyNumber, value } = user;
+        res.status(200).json({ _id, fullname, email, age, phone, roles, teams, games, rate, position, jersyNumber, value });
+    } catch (error) {
+        console.error('Error fetching user by email:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
+module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,getallPlayers,getPlayersByIds,getByEmail}
