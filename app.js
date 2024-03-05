@@ -12,12 +12,13 @@ const passport = require("passport");
 const googleAuth = require("./routes/index");
 const session = require("express-session");
 
+
+
 // Middleware
 app.use(Bodyparser.json());
 app.use(cors());
 app.use(cookieParser())
 require('dotenv').config()
-// Routes
 
 //session
 app.use(
@@ -36,7 +37,7 @@ require("./auth/google-auth")(passport);
 
 app.use("/", googleAuth);
 
-
+// Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
 
@@ -45,6 +46,13 @@ app.use("/Tournament", TournamentRouter);
 
 const TeamRouter = require("./routes/Team");
 app.use("/Team", TeamRouter);
+
+const PaymentRouter = require("./routes/Payment");
+app.use("/Payment", PaymentRouter);
+
+// complaint Routes
+const ComplaintRouter = require("./routes/Complaint");
+app.use("/api", ComplaintRouter);
 
 // Server setup
 const PORT = 3000;

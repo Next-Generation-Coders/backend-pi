@@ -60,6 +60,7 @@ const loginUser = async (req, res) => {
                 isBlocked:user.isBlocked,
                 isVerified:user.isVerified,
                 age:user.age,
+                avatar:user.avatar
             }})
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -117,6 +118,7 @@ const signupUser = async (req, res) => {
                 isBlocked:user.isBlocked,
                 isVerified:user.isVerified,
                 age:user.age,
+                avatar:user.avatar
         }})
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -158,6 +160,7 @@ const refresh = (req, res) => {
                         isBlocked:user.isBlocked,
                         isVerified:user.isVerified,
                         age:user.age,
+                        avatar:user.avatar
                     }})
         })
     )
@@ -307,6 +310,7 @@ async function updateUserProfile(req,res){
                 isBlocked:user.isBlocked,
                 isVerified:user.isVerified,
                 age:user.age,
+                avatar:user.avatar
             }});
 
     }catch(err){
@@ -351,6 +355,7 @@ async function getUserByEmail (req,res){
                 isBlocked:user.isBlocked,
                 isVerified:user.isVerified,
                 age:user.age,
+                avatar:user.avatar
             }});
     }catch(e){
         res.status(401).json({error : e.message})
@@ -359,7 +364,19 @@ async function getUserByEmail (req,res){
 }
 
 
+async function saveAvatar (req, res) {
+    try {
+        const user = req.user
+        user.avatar = req.file.filename;
+        await User.findByIdAndUpdate(user._id,user);
+        const u = await User.findById(user._id);
+        res.status(200).json({message:u.fullname+" Your avatar uploaded successfully!"})
 
+    } catch (error) {
+        console.error('Error uploading avatar:', error.message);
+        res.status(401).send({error:error.message});
+    }
+}
 
 
 
@@ -444,4 +461,25 @@ async function deleteUser (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser,updateUserProfile,getUserByEmail,changePassword}
+async function getByEmail (req, res)  {
+    const { email } = req.query;
+    console.log(email);
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Return the user details without sensitive information (e.g., password)
+        const { _id, fullname, age, phone, roles, teams, games, rate, position, jersyNumber, value } = user;
+        res.status(200).json({ _id, fullname, email, age, phone, roles, teams, games, rate, position, jersyNumber, value });
+    } catch (error) {
+        console.error('Error fetching user by email:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
+
+module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser,updateUserProfile,getUserByEmail,changePassword,saveAvatar,getByEmail}

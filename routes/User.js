@@ -2,6 +2,7 @@ const express=require("express")
 const router=express.Router()
 const UserController=require('../Controller/UserController')
 const tokenVerif = require('../middlewares/tokenVerification')
+const upload = require('../config/multer')
 
 //Auth
 router.post('/signup',UserController.signupUser);
@@ -24,6 +25,8 @@ router.put('/change-password',tokenVerif.requireAuth,UserController.changePasswo
 
 router.get('/email/:email',UserController.getUserByEmail)
 
+router.put('/avatar',tokenVerif.requireAuth,upload.single('avatar'),UserController.saveAvatar)
+
 
 //CRUD
 router.post('/add',UserController.add);
@@ -37,6 +40,8 @@ router.get('/getbyname/:name',tokenVerif.requireCoachAndPlayer,UserController.ge
 router.put('/update/:id',UserController.update);
 
 router.delete('/delete/:id',UserController.deleteUser);
+
+router.get('/getbyemail', UserController.getByEmail);
 
 module.exports = router;
 

@@ -49,14 +49,29 @@ const User = new Schema({
     value:String,
     secret:String,
     googleId:String,
-    pic:String,
+    avatar:{
+        type:String,
+        default:null
+    },
     country:{
-        label:String,
-        value:String,
+        label:{
+            type:String,
+            default:null
+        },
+        value:{
+            type:String,
+            default:null
+        },
     },
     city:{
-        label:String,
-        value:String,
+        label:{
+            type:String,
+            default:null
+        },
+        value:{
+            type:String,
+            default:null
+        },
     }
 
 })
