@@ -8,7 +8,7 @@ async function add (req,res){
     try{
     const tournament= new Tournament(req.body)
     await tournament.save();
-    res.status(200).send("Add");
+    res.status(200);
     } catch (err){
         res.status(400).json({error:err})
     }
@@ -121,6 +121,29 @@ async function generateRoundRobinSchedule(req,res) {
     }
 }
 
+async function addTeams(req, res) {
+    try {
+        const tournamentId = req.params.id;
+        const teamsToAdd = req.body.teams;
 
+        // Find the tournament by ID
+        const tournament = await Tournament.findById(tournamentId);
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTournament,generateRoundRobinSchedule}
+        if (!tournament) {
+            return res.status(404).json({ error: "Tournament not found" });
+        }
+
+        // Push the IDs of teams to add into the teams array field of the tournament document
+        tournament.teams.push(...teamsToAdd);
+
+        // Save the updated tournament document
+        const updatedTournament = await tournament.save();
+
+        res.status(200).json({ message: "Teams added to tournament successfully", tournament: updatedTournament });
+    } catch (error) {
+        console.error("Error adding teams:", error);
+        res.status(500).json({ error: "Failed to add teams" });
+    }
+}
+
+module.exports={add,getall,getbyid,getbyname,update,deleteTournament,generateRoundRobinSchedule,addTeams}

@@ -28,7 +28,7 @@ const MatchRouter = require("./routes/Match");
 app.use("/Match", MatchRouter);
 
 // Server setup
-const PORT = 3000;
+const PORT = 3001;
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Database connection

@@ -2,7 +2,7 @@ const express=require("express")
 const router=express.Router()
 const TeamController=require('../Controller/TeamController')
 
-
+const requireAuth = require('../middlewares/tokenVerification');
 
 
 router.post('/add',TeamController.add);
