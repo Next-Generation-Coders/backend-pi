@@ -11,19 +11,19 @@ const TeamSchema = new Schema({
     logo: String,
     players: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'user'
     }],
     coach: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'user'
     },
     staff: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'user'
     }],
     matches: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Match'
+        ref: 'match'
     }]
 });
 
