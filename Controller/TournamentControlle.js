@@ -59,7 +59,17 @@ async function update (req,res){
     }
 
 }
+async function getTournamentsByUserId(req, res) {
+    const userId = req.params.userId;
 
+    try {
+        const tournaments = await Tournament.find({user:userId});
+        res.status(200).json({ tournaments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 async function deleteTournament (req,res){
     try{
         await Tournament.findByIdAndDelete(req.params.id)
@@ -73,4 +83,4 @@ async function deleteTournament (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTournament}
+module.exports={add,getall,getbyid,getbyname,update,deleteTournament,getTournamentsByUserId}

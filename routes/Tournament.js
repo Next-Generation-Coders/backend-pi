@@ -17,6 +17,8 @@ router.put('/update/:id',TournamentControlle.update);
 
 router.delete('/delete/:id',TournamentControlle.deleteTournament);
 
+router.get('/getByUserId/:userId', TournamentControlle.getTournamentsByUserId);
+
 module.exports = router;
 
 
