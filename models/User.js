@@ -38,6 +38,10 @@ const User = new Schema({
         type: mongo.Schema.Types.ObjectId,
         ref: 'Team'
     }],
+    currentTeam: {
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'Team'
+    },
     // games played by coach and player
     games:Number ,
     // rating of player or coach

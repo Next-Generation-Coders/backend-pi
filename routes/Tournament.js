@@ -2,8 +2,7 @@ const express=require("express")
 const router=express.Router()
 const TournamentControlle=require('../Controller/TournamentControlle')
 
-
-
+const { requireAuth } = require('../middlewares/tokenVerification')
 
 router.post('/add',TournamentControlle.add);
 
@@ -18,6 +17,10 @@ router.put('/update/:id',TournamentControlle.update);
 router.delete('/delete/:id',TournamentControlle.deleteTournament);
 
 router.get('/getByUserId/:userId', TournamentControlle.getTournamentsByUserId);
+
+router.get('/generateRoundRobinSchedule/:id',TournamentControlle.generateRoundRobinSchedule);
+
+router.put('/addTeams/:id', TournamentControlle.addTeams);
 
 module.exports = router;
 

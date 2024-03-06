@@ -28,6 +28,7 @@ router.get('/email/:email',UserController.getUserByEmail)
 router.put('/avatar',tokenVerif.requireAuth,upload.single('avatar'),UserController.saveAvatar)
 
 
+
 //CRUD
 router.post('/add',UserController.add);
 
@@ -41,9 +42,8 @@ router.put('/update/:id',UserController.update);
 
 router.delete('/delete/:id',UserController.deleteUser);
 
+router.get('/getallPlayers',UserController.getallPlayers);
+
 router.get('/getbyemail', UserController.getByEmail);
 
 module.exports = router;
-
-
-

@@ -19,7 +19,8 @@ const loginUser = async (req, res) => {
 
         const accessToken = jwt.sign(
             {
-                "_id": user._id
+                "_id": user._id,
+                "user": user._id._id
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
@@ -29,6 +30,7 @@ const loginUser = async (req, res) => {
             {
                 "_id": user._id
             },
+            { "user": user._id._id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         )
@@ -79,7 +81,8 @@ const signupUser = async (req, res) => {
 
         const accessToken = jwt.sign(
             {
-                "_id": user._id
+                "_id": user._id,
+                "user": user._id
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
@@ -90,6 +93,7 @@ const signupUser = async (req, res) => {
             {
                 "_id": user._id
             },
+            { "user": user._id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         )
@@ -461,6 +465,27 @@ async function deleteUser (req,res){
 
 }
 
+
+async function getallPlayers(req, res) {
+    try {
+        const data = await User.find({ role: 'PLAYER' });
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
+
+async function getPlayersByIds(playerIds) {
+    try {
+        const players = await User.find({ _id: { $in: playerIds } });
+        return players.map(player => `${player.fullname} (${player.position})`); // Assuming the player name field is "fullname"
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
 async function getByEmail (req, res)  {
     const { email } = req.query;
     console.log(email);
@@ -482,4 +507,4 @@ async function getByEmail (req, res)  {
 
 
 
-module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser,updateUserProfile,getUserByEmail,changePassword,saveAvatar,getByEmail}
+module.exports={add,getall,getbyid,getbyname,update,deleteUser,loginUser,signupUser,verifyEmail,resetPassword,refresh,checkRoles,toggleBlockUser,updateUserProfile,getUserByEmail,changePassword,saveAvatar,getallPlayers,getPlayersByIds,getByEmail}
