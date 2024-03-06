@@ -1,16 +1,10 @@
-const express = require("express")
-const http = require("http")
-const cors = require('cors');
-var app = express()
 const express = require("express");
 const http = require("http");
 const cors = require('cors');
 const Bodyparser = require('body-parser');
 const mongo = require("mongoose");
 const app = express();
-const server = http.createServer(app);
 const config = require('./config/dbconfig.json');
-const Tournament = require('./models/Tournament');
 const cookieParser = require('cookie-parser')
 const passport = require("passport");
 const googleAuth = require("./routes/index");
@@ -43,14 +37,7 @@ require("./auth/google-auth")(passport);
 app.use("/", googleAuth);
 
 
-const Bodyparser=require('body-parser')
-const mongo= require ("mongoose")
-const server = http.createServer(app)
-const allowedOrigin = 'http://localhost:5173';
-const config=require ('./config/dbconfig.json')
 app.use(Bodyparser.json())
-const db = require('./config/dbcon');
-const Tournament = require('./models/Tournament');
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
@@ -70,9 +57,6 @@ const ComplaintRouter = require("./routes/Complaint");
 app.use("/api", ComplaintRouter);
 
 // Server setup
-const PORT = 3000;
-server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
-
 app.use("/api",ResultRouter);
 const server=http.createServer(app);
 const io=require("socket.io")(server);
@@ -92,7 +76,7 @@ io.on("connection", (socket) => {
             // Update match data in the database based on the team that scored
             const result = await Result.findOne().populate('match');
             if (!result) {
-                throw new Error('Match not found');
+                Error('Match not found');
             }
 
             if (team === 'team1') {
