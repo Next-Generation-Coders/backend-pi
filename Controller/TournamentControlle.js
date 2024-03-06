@@ -89,7 +89,7 @@ async function generateRoundRobinSchedule(req,res) {
     try {
         const tournament = await Tournament.findById(req.params.id).populate('teams');
         if (!tournament) {
-            throw new Error("Tournament not found");
+           Error("Tournament not found");
         }
 
         const teams = tournament.teams;
@@ -156,4 +156,4 @@ async function addTeams(req, res) {
     }
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTournament,generateRoundRobinSchedule,addTeams}
+module.exports={add,getall,getbyid,getbyname,update,deleteTournament,generateRoundRobinSchedule,addTeams,getTournamentsByUserId}

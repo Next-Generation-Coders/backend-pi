@@ -1,7 +1,7 @@
 const UserModel = require("../models/User");
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-
+require('dotenv').config()
 module.exports = () => {
     passport.serializeUser(function (user, done) {
         done(null, user.id);
@@ -13,13 +13,13 @@ module.exports = () => {
             done(err, user);
         });
     });
-
 // Définition de la stratégie Google OAuth 2.0
     passport.use(new GoogleStrategy({
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: "/auth/google/callback", // Modification du callbackURL
+            callbackURL: "/auth/google/callback",
         },
+
         async function(accessToken, refreshToken, profile, cb) {
             try {
                 // console.log(profile);

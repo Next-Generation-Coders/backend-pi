@@ -4,15 +4,12 @@ const cors = require('cors');
 const Bodyparser = require('body-parser');
 const mongo = require("mongoose");
 const app = express();
-const config = require('./config/dbconfig.json');
-const cookieParser = require('cookie-parser')
 const passport = require("passport");
 const googleAuth = require("./routes/index");
 const session = require("express-session");
 const ResultRouter=require("./routes/ResultRoute");
 const Result = require('./models/Result')
 const config = require('./config/dbconfig.json');
-const Tournament = require('./models/Tournament');
 const cookieParser = require('cookie-parser') ;
 
 // Middleware
