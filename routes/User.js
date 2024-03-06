@@ -32,6 +32,3 @@ router.get('/getallPlayers',UserController.getallPlayers);
 router.get('/getbyemail', UserController.getByEmail);
 
 module.exports = router;
-
-
-

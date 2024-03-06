@@ -26,6 +26,3 @@ router.put('/updateXTeam/:id',TeamController.updateXTeam);
 router.get('/getTeambyCoach/:id',TeamController.getTeambyCoach);
 
 module.exports = router;
-
-
-
