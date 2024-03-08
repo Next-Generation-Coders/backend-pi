@@ -16,11 +16,10 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.login(email, password)
         user.password = '';
-
         const accessToken = jwt.sign(
             {
                 "_id": user._id,
-                "user": user._id._id
+                "user": user._id
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
@@ -30,7 +29,6 @@ const loginUser = async (req, res) => {
             {
                 "_id": user._id
             },
-            { "user": user._id._id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         )
@@ -42,16 +40,17 @@ const loginUser = async (req, res) => {
         })
 
 
-        if(!user.verified){
-            await mailer.sendMail({
-                from: 'moatazfoudhailii@gmail.com', // sender address
-                to: email, // list of receivers
-                subject: "Confirm account", // Subject line
-                text: "Please confirm", // plain text body
-                html: "<b>Hello, confirm please</b>", // html body
-            });
-        }
-        // Send accessToken containing username and roles
+        // if(!user.verified){
+        //     await mailer.sendMail({
+        //         from: 'moatazfoudhailii@gmail.com', // sender address
+        //         to: email, // list of receivers
+        //         subject: "Confirm account", // Subject line
+        //         text: "Please confirm", // plain text body
+        //         html: "<b>Hello, confirm please</b>", // html body
+        //     });
+        // }
+
+
         res.json({ accessToken, user:{
                 email: user.email,
                 fullname: user.fullname,
