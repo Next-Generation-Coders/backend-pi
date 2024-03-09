@@ -16,7 +16,7 @@ async function add(req, res) {
         team.staff = [];
         team.matches = [];
 
-        await team.save();
+        await team.save(); 
 
         const coach = await Coach.findById(req.params.id)
         coach.currentTeam = team._id;
