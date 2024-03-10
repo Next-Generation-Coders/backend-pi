@@ -48,4 +48,8 @@ router.get('/getbyemail', UserController.getByEmail);
 
 router.get('/getPlayersByIds/:id',UserController.getPlayersByIds);
 
+router.get('/getallPlayersWithNoTeam',UserController.getallPlayersWithNoTeam);
+
+router.get('/getallCoachesWithNoTeam',UserController.getallCoachesWithNoTeam);
+
 module.exports = router;

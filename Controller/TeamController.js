@@ -13,6 +13,7 @@ async function add(req, res) {
         team.logo = "";
         team.players =  [];
         team.coach = req.params.id;
+        team.team_manager = req.params.id;
         team.staff = [];
         team.matches = [];
 
@@ -21,6 +22,10 @@ async function add(req, res) {
         const coach = await Coach.findById(req.params.id)
         coach.currentTeam = team._id;
         await coach.save();
+
+        const teamManager = await Coach.findById(req.params.id)
+        teamManager.currentTeam = team._id;
+        await teamManager.save();
         
         res.status(200).send("Add");
     } catch (err) {
@@ -101,8 +106,8 @@ async function deleteTeam (req,res){
 async function addPlayerToTeam(req, res) {
     try {
         const coach = await Coach.findById(req.params.id);
-/*         if (coach && coach.roles === 'COACH') {
- */            // Check if the player already exists in the database
+//         if (coach && coach.roles === 'COACH') {
+ //            // Check if the player already exists in the database
             const existingPlayer = await User.findOne({ email: req.body.email });
             if (existingPlayer) {
                 // Check if the existing player is already part of a team
@@ -120,6 +125,7 @@ async function addPlayerToTeam(req, res) {
             } else {
                 // Create a new player if they don't exist
                 const player = new User(req.body);
+                console.log(player)
                 player.roles=[10,11] 
                 player.currentTeam=coach.currentTeam
                 player.teams.push(coach.currentTeam)
@@ -143,9 +149,6 @@ async function addPlayerToTeam(req, res) {
         //await team.save();
 
         return res.status(200).json({ message: 'Player added to the team successfully' });
-        /*}  else {
-            return res.status(404).json({ error: 'Coach not found or not authorized' });
-        } */
     } catch (err) {
         return res.status(400).json({ error: err.message });
     }
@@ -155,7 +158,7 @@ async function addPlayerToTeam(req, res) {
 
 async function checkCoach(req, res) {
     try {
-        const team = await Team.findOne({ coach: req.params.id });
+        const team = await Team.findOne({ team_manager: req.params.id });
         if (team) {
             //the coach is part of a team
             res.status(200).json({ exists: true });
@@ -212,4 +215,20 @@ async function getTeambyTeamManger (req,res){
     }
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkCoach,updateXTeam,getTeambyCoach,getTeambyTeamManger}
+async function addCoachToTeam(req, res) {
+     try {
+        const Tmanager = await Coach.findById(req.params.id);
+            const existingCoach = await User.findOne({ email: req.body.email });
+            existingCoach.currentTeam=Tmanager.currentTeam;
+            existingCoach.teams.push(Tmanager.currentTeam)
+                const team = await Team.findOne({ team_manager: Tmanager._id });
+                team.coach=existingCoach._id;
+                await team.save();
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+}
+}
+
+
+module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkCoach,updateXTeam,getTeambyCoach,getTeambyTeamManger,addCoachToTeam}

@@ -27,4 +27,6 @@ router.get('/getTeambyCoach/:id',TeamController.getTeambyCoach);
 
 router.get('/getTeambyTeamManger/:id',TeamController.getTeambyTeamManger);
 
+router.post('/addCoachToTeam/:id',TeamController.addCoachToTeam);
+
 module.exports = router;

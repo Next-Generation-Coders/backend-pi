@@ -476,7 +476,7 @@ async function deleteUser(req, res) {
 
 async function getallPlayers(req, res) {
     try {
-        const data = await User.find({role: 'PLAYER'});
+        const data = await User.find({role: 11});
         res.status(200).send(data);
     } catch (err) {
         res.status(400).json({error: err});
@@ -533,6 +533,23 @@ async function getByEmail(req, res) {
     }
 }
 
+async function getallPlayersWithNoTeam(req, res) {
+    try {
+        const data = await User.find({ roles: 11, currentTeam: null});
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({error: err});
+    }
+}
+
+async function getallCoachesWithNoTeam(req, res) {
+    try {
+        const data = await User.find({ roles: 12, currentTeam: null});
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({error: err});
+    }
+}
 
 module.exports = {
     add,
@@ -554,5 +571,7 @@ module.exports = {
     saveAvatar,
     getallPlayers,
     getPlayersByIds,
-    getByEmail
+    getByEmail,
+    getallPlayersWithNoTeam,
+    getallCoachesWithNoTeam
 }
