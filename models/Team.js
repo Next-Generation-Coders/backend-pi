@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const User = require('./User');
-const Match = require('./Match');
 
 const TeamSchema = new Schema({
     name: String,
@@ -21,7 +19,11 @@ const TeamSchema = new Schema({
     matches: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'match'
-    }]
+    }],
+    team_manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
 });
 
 module.exports = mongoose.model('Team', TeamSchema);

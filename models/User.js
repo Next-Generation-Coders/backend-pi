@@ -5,13 +5,24 @@ const validator = require('validator')
 
 const Schema = mongo.Schema
 
+// USER : 10
+// PLAYER : 11
+// COACH : 12
+// ORGANIZER : 13
+
+// REFEREE : 20
+// TEAM MANAGER : 21
+
+// ADMIN : 30
+
 const Role = {
-    COACH: 'COACH',
-    PLAYER: 'PLAYER',
-    REFEREE: 'REFEREE',
-    ORGANIZER : 'ORGANIZER',
-    USER : 'USER',
-    ADMIN : 'ADMIN'
+    COACH: 12,
+    PLAYER: 11,
+    REFEREE: 20,
+    ORGANIZER : 13,
+    USER : 10,
+    ADMIN : 30,
+    TEAM_MANAGER: 21
   };
 
 const User = new Schema({
@@ -25,10 +36,14 @@ const User = new Schema({
         default:false
     },
     roles : [{
-        type : String,
+        type : Number,
         enum : Object.values(Role),
         default : Role.USER
     }],
+    isBlocked: {
+        type:Boolean,
+        default : false
+    },
     //teams to show player previous team // Coach also maybe
     teams: [{
         type: mongo.Schema.Types.ObjectId,
@@ -45,7 +60,34 @@ const User = new Schema({
     // for player
     position:String ,
     jersyNumber:Number ,
-    value:String //parseFloat to chnage it to float
+    //parseFloat to chnage it to float
+    value:String,
+    secret:String,
+    googleId:String,
+    avatar:{
+        type:String,
+        default:null
+    },
+    country:{
+        label:{
+            type:String,
+            default:null
+        },
+        value:{
+            type:String,
+            default:null
+        },
+    },
+    city:{
+        label:{
+            type:String,
+            default:null
+        },
+        value:{
+            type:String,
+            default:null
+        },
+    }
 
 })
 
@@ -92,6 +134,33 @@ User.statics.signup = async function(email, password,phone,fullname,age) {
     const rls = [Role.USER];
     const vrf=false;
     return await this.create({email, password: hash,phone,age,fullname,roles:rls,verified:vrf})
+}
+
+
+User.statics.signupPlayer = async function(email, password,phone,fullname,age,position,jerseyNumber) {
+
+    if (!email || !password || !phone || !fullname || !age) {
+        throw Error('All fields must be filled')
+    }
+    if (!validator.isEmail(email)) {
+        throw Error('Email not valid')
+    }
+    if (!validator.isStrongPassword(password)) {
+        throw Error('Password not strong enough')
+    }
+
+    const exists = await this.findOne({ email })
+
+    if (exists) {
+        throw Error('Email already in use')
+    }
+
+    const salt = await bcrypt.genSalt(10)
+    const hash = await bcrypt.hash(password, salt)
+
+    const rls = [Role.PLAYER,Role.USER];
+    const vrf=false;
+    return await this.create({email, password: hash,phone,age,fullname,roles:rls,verified:vrf,jerseyNumber,position})
 }
 
 module.exports = mongo.model('user',User);

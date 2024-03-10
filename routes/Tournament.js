@@ -16,6 +16,8 @@ router.put('/update/:id',TournamentControlle.update);
 
 router.delete('/delete/:id',TournamentControlle.deleteTournament);
 
+router.get('/getByUserId/:userId', TournamentControlle.getTournamentsByUserId);
+
 router.get('/generateRoundRobinSchedule/:id',TournamentControlle.generateRoundRobinSchedule);
 
 router.put('/addTeams/:id', TournamentControlle.addTeams);

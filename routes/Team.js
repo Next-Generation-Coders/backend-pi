@@ -25,4 +25,6 @@ router.put('/updateXTeam/:id',TeamController.updateXTeam);
 
 router.get('/getTeambyCoach/:id',TeamController.getTeambyCoach);
 
+router.get('/getTeambyTeamManger/:id',TeamController.getTeambyTeamManger);
+
 module.exports = router;

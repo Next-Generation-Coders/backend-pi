@@ -114,19 +114,19 @@ async function addPlayerToTeam(req, res) {
                 }
                 existingPlayer.currentTeam=coach.currentTeam;
                 existingPlayer.teams.push(coach.currentTeam)
-                const team = await Team.findOne({ coach: coach._id });
+                const team = await Team.findOne({ team_manager: coach._id });
                 team.players.push(existingPlayer._id);
                 await team.save();
             } else {
                 // Create a new player if they don't exist
                 const player = new User(req.body);
-                player.roles=['USER','PLAYER']
+                player.roles=[10,11] 
                 player.currentTeam=coach.currentTeam
                 player.teams.push(coach.currentTeam)
                 //console.log(player+"\n"+player.roles)
                 await player.save();
                 //existingPlayer = player;
-                const team = await Team.findOne({ coach: coach._id });
+                const team = await Team.findOne({ team_manager: coach._id });
                 team.players.push(player._id);
                 await team.save();
             }
@@ -196,4 +196,20 @@ async function getTeambyCoach (req,res){
     }
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkCoach,updateXTeam,getTeambyCoach}
+async function getTeambyTeamManger (req,res){
+    try {
+        const team = await Team.findOne({ team_manager: req.params.id });
+        if (!team) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+        const playerNames = await getPlayersByIds(team.players);
+        //const coachName = await getPlayersByIds(team.coach);
+        const teamWithPlayerNames = { ...team.toObject(), playerNames };
+        res.status(200).json(teamWithPlayerNames);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkCoach,updateXTeam,getTeambyCoach,getTeambyTeamManger}
