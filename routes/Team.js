@@ -1,6 +1,7 @@
 const express=require("express")
 const router=express.Router()
 const TeamController=require('../Controller/TeamController')
+const LineupController=require('../Controller/LineupController')
 
 
 
@@ -28,5 +29,7 @@ router.get('/getTeambyCoach/:id',TeamController.getTeambyCoach);
 router.get('/getTeambyTeamManger/:id',TeamController.getTeambyTeamManger);
 
 router.post('/addCoachToTeam/:id',TeamController.addCoachToTeam);
+
+router.post('/addLineup',LineupController.add);
 
 module.exports = router;
