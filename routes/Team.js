@@ -32,4 +32,8 @@ router.post('/addCoachToTeam/:id',TeamController.addCoachToTeam);
 
 router.post('/addLineup',LineupController.add);
 
+router.get('/getLineup/:teamId',LineupController.getLineup);
+
+router.put('/updateLineup/:teamId',LineupController.updateLineup);
+
 module.exports = router;

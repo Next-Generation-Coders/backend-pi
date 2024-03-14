@@ -12,10 +12,10 @@ const LineupSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team'
     },
-    matches: [{
+    matches: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'match'
-    }],
+    },
     team_manager: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
