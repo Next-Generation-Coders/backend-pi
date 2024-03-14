@@ -11,11 +11,12 @@ const ResultRouter=require("./routes/ResultRoute");
 const Result = require('./models/Result')
 const config = require('./config/dbconfig.json');
 const cookieParser = require('cookie-parser') ;
-
+const stripe = require("stripe")("sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUqfXgls0HWLwNFa3ia10KP0VEgBH7lNBzx5QRX0obVbd3tfK9tS6f00vEmRLwkg");
+const stripeWebhookSecret = "whsec_DkhMYus3KybNiTsCJ5SlJO3a39ZN0ShO";
 // Middleware
-app.use(Bodyparser.json());
 app.use(cors());
-app.use(cookieParser())
+app.use(cookieParser());
+require("dotenv").config();
 
 //session
 app.use(
@@ -27,6 +28,7 @@ app.use(
 );
 
 //morgan
+app.use('/webhook', Bodyparser.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
@@ -34,9 +36,6 @@ require("./auth/google-auth")(passport);
 
 app.use("/", googleAuth);
 
-
-app.use(Bodyparser.json())
-require('dotenv').config() 
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
@@ -51,9 +50,52 @@ app.use(cors());
 const PaymentRouter = require("./routes/Payment");
 app.use("/Payment", PaymentRouter);
 
+const NotificationRouter = require("./routes/Notification");
+app.use("/Notification", NotificationRouter);
+
 // complaint Routes
 const ComplaintRouter = require("./routes/Complaint");
+const Payment = require("./models/Payment");
 app.use("/api", ComplaintRouter);
+
+
+app.post('/webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, stripeWebhookSecret);
+    } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const Created = session.created;
+
+        try {
+            const payment = await Payment.findOne({ created: Created });
+
+            if (payment) {
+                payment.payment_status = 'paid';
+                await payment.save();
+
+                console.log(`Payment with payment_intent ${Created} updated to paid.`);
+            } else {
+                console.error(`Payment with payment_intent ${Created} not found.`);
+                const allPayments = await Payment.find();
+                console.log('All Payments:', allPayments);
+            }
+        } catch (error) {
+            console.error('Error finding/updating payment:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
+
+    res.json({ received: true });
+});
+
+
 const MatchRouter = require("./routes/Match");
 app.use("/Match", MatchRouter);
 
