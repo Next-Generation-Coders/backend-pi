@@ -5,7 +5,7 @@ const Schema = mongo.Schema;
 const Complaint = new Schema({
     user: {
         type: mongo.Schema.Types.ObjectId,
-        ref: 'user', 
+        ref: 'user',
         required: true
     },
     title: {
@@ -18,12 +18,12 @@ const Complaint = new Schema({
     },
     status: {
         type: String,
-        enum: ['OPEN', 'IN_PROGRESS', 'CLOSED'],
+        enum: ['ANSWERED', 'IN_PROGRESS'],
         default: 'IN_PROGRESS'
     },
     adminResponse: {
         type: String,
-        default: '' 
+        default: ''
     },
     createdAt: {
         type: Date,

@@ -34,7 +34,7 @@ router.post('/add',UserController.add);
 
 router.get('/getall',tokenVerif.requireAdmin,UserController.getall);
 
-router.get('/getbyid/:id',tokenVerif.requireAdmin,UserController.getbyid);
+router.get('/getbyid/:id',UserController.getbyid);
 
 router.get('/getbyname/:name',tokenVerif.requireCoachAndPlayer,UserController.getbyname);
 
@@ -45,5 +45,11 @@ router.delete('/delete/:id',UserController.deleteUser);
 router.get('/getallPlayers',UserController.getallPlayers);
 
 router.get('/getbyemail', UserController.getByEmail);
+
+router.get('/getPlayersByIds/:id',UserController.getPlayersByIds);
+
+router.get('/getallPlayersWithNoTeam',UserController.getallPlayersWithNoTeam);
+
+router.get('/getallCoachesWithNoTeam',UserController.getallCoachesWithNoTeam);
 
 module.exports = router;

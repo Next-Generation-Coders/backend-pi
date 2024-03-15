@@ -11,12 +11,13 @@ const ResultRouter=require("./routes/ResultRoute");
 const Result = require('./models/Result')
 const config = require('./config/dbconfig.json');
 const cookieParser = require('cookie-parser') ;
-
+const stripe = require("stripe")("sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUqfXgls0HWLwNFa3ia10KP0VEgBH7lNBzx5QRX0obVbd3tfK9tS6f00vEmRLwkg");
+const stripeWebhookSecret = "whsec_DkhMYus3KybNiTsCJ5SlJO3a39ZN0ShO";
 // Middleware
 app.use(Bodyparser.json());
 app.use(cors());
-app.use(cookieParser())
-require('dotenv').config()
+app.use(cookieParser());
+require("dotenv").config();
 
 //session
 app.use(
@@ -35,9 +36,6 @@ require("./auth/google-auth")(passport);
 
 app.use("/", googleAuth);
 
-
-app.use(Bodyparser.json())
-require('dotenv').config()
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
@@ -52,11 +50,51 @@ app.use(cors());
 const PaymentRouter = require("./routes/Payment");
 app.use("/Payment", PaymentRouter);
 
+const NotificationRouter = require("./routes/Notification");
+app.use("/Notification", NotificationRouter);
+
 // complaint Routes
 const ComplaintRouter = require("./routes/Complaint");
+const Payment = require("./models/Payment");
 app.use("/api", ComplaintRouter);
-// Generate network avatars
-app.use('/uploads/avatar', express.static('uploads/avatar'));
+
+
+app.post('/webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, stripeWebhookSecret);
+    } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const Created = session.created;
+
+        try {
+            const payment = await Payment.findOne({ created: Created });
+
+            if (payment) {
+                payment.payment_status = 'paid';
+                await payment.save();
+
+                console.log(`Payment with payment_intent ${Created} updated to paid.`);
+            } else {
+                console.error(`Payment with payment_intent ${Created} not found.`);
+                const allPayments = await Payment.find();
+                console.log('All Payments:', allPayments);
+            }
+        } catch (error) {
+            console.error('Error finding/updating payment:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
+
+    res.json({ received: true });
+});
+
 
 const MatchRouter = require("./routes/Match");
 app.use("/Match", MatchRouter);
@@ -101,6 +139,112 @@ io.on("connection", (socket) => {
             console.error('Error:', error.message);
         }
     });
+  socket.on('red', async ({ team }) => {
+    try {
+      // Update match data in the database based on the team that scored
+      const result = await Result.findOne().populate('match');
+      if (!result) {
+        throw new Error('Match not found');
+      }
+
+      if (team === 'team1') {
+        console.log("team1 red")
+        result.team1Red++;
+      } else if (team === 'team2') {
+        console.log("team2 red")
+
+        result.team2Red++;
+      }
+
+      await result.save();
+
+      // Emit scoreUpdate event to all connected clients with updated score information
+      io.emit('redUpdate', { team1Red: result.team1Red, team2Red: result.team2Red });
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  }
+  );
+  socket.on('yellow', async ({ team }) => {
+    try {
+      // Update match data in the database based on the team that scored
+      const result = await Result.findOne().populate('match');
+      if (!result) {
+        throw new Error('Match not found');
+      }
+
+      if (team === 'team1') {
+        console.log("team1 yellow")
+        result.team1Yellow++;
+      } else if (team === 'team2') {
+        console.log("team2 yellow")
+
+        result.team2Yellow++;
+      }
+
+      await result.save();
+
+      // Emit scoreUpdate event to all connected clients with updated score information
+      io.emit('yellowUpdate', { team1Yellow: result.team1Yellow, team2Yellow: result.team2Yellow });
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  }
+  );
+  socket.on('corners', async ({ team }) => {
+    try {
+      // Update match data in the database based on the team that scored
+      const result = await Result.findOne().populate('match');
+      if (!result) {
+        throw new Error('Match not found');
+      }
+
+      if (team === 'team1') {
+        console.log("team1 corner")
+        result.team1Corners++;
+      } else if (team === 'team2') {
+        console.log("team2 corner")
+
+        result.team2Corners++;
+      }
+
+      await result.save();
+
+      // Emit scoreUpdate event to all connected clients with updated score information
+      io.emit('cornersUpdate', { team1Corners: result.team1Corners, team2Corners: result.team2Corners });
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  }
+  );
+  socket.on('offsides', async ({ team }) => {
+    try {
+      // Update match data in the database based on the team that scored
+      const result = await Result.findOne().populate('match');
+      if (!result) {
+        throw new Error('Match not found');
+      }
+
+      if (team === 'team1') {
+        console.log("team1 offside")
+        result.team1Offsides++;
+      } else if (team === 'team2') {
+        console.log("team2 offside")
+
+        result.team2Offsides++;
+      }
+
+      await result.save();
+
+      // Emit scoreUpdate event to all connected clients with updated score information
+      io.emit('offsidesUpdate', { team1Offsides: result.team1Offsides, team2Offsides: result.team2Offsides });
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  }
+  );
+
+
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');

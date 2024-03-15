@@ -7,7 +7,6 @@ const asyncHandler = require('express-async-handler')
 const templateMail = require('../config/templateMail.js');
 const multer = require('../config/multer')
 
-
 //                  =================================================
 //                  ===================== AUTH ======================
 //                  =================================================
@@ -470,7 +469,7 @@ async function deleteUser(req, res) {
 
 async function getallPlayers(req, res) {
     try {
-        const data = await User.find({role: 'PLAYER'});
+        const data = await User.find({role: 11});
         res.status(200).send(data);
     } catch (err) {
         res.status(400).json({error: err});
@@ -480,8 +479,15 @@ async function getallPlayers(req, res) {
 
 async function getPlayersByIds(playerIds) {
     try {
-        const players = await User.find({_id: {$in: playerIds}});
-        return players.map(player => `${player.fullname} (${player.position})`); // Assuming the player name field is "fullname"
+        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');;
+        return players.map(player => ({
+            id :player._id,
+            fullname: player.fullname,
+            jersyNumber: player.jersyNumber,
+            position: player.position,
+            
+        }));
+        
     } catch (error) {
         console.error(error);
         return [];
@@ -521,6 +527,23 @@ async function getByEmail(req, res) {
     }
 }
 
+async function getallPlayersWithNoTeam(req, res) {
+    try {
+        const data = await User.find({ roles: 11, currentTeam: null});
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({error: err});
+    }
+}
+
+async function getallCoachesWithNoTeam(req, res) {
+    try {
+        const data = await User.find({ roles: 12, currentTeam: null});
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({error: err});
+    }
+}
 
 module.exports = {
     add,
@@ -542,5 +565,7 @@ module.exports = {
     saveAvatar,
     getallPlayers,
     getPlayersByIds,
-    getByEmail
+    getByEmail,
+    getallPlayersWithNoTeam,
+    getallCoachesWithNoTeam
 }

@@ -1,16 +1,11 @@
 const Payment = require("../models/Payment");
+require('dotenv').config();
+//twilio
+const accountSid=process.env.TWILIOID
+const authToken='79218cf2d27e323d1dd05f6687e902b3'
+const client =require('twilio')(accountSid,authToken);
 
 
-// Fonction pour récupérer tous les paiements
-/*exports.getAllPayments = async (req, res) => {
-    try {
-        const payments = await Payment.find();
-        res.json(payments);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-*/
 
 exports.getAllPayments = async (req, res) => {
     try {
@@ -21,7 +16,7 @@ exports.getAllPayments = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-  
+
 
 // Fonction pour récupérer un paiement par son identifiant
 exports.getPaymentById = async (req, res) => {
@@ -56,7 +51,6 @@ exports.createPayment = async (req, res) => {
     }
 };
 
-// Fonction pour mettre à jour un paiement existant
 exports.updatePayment = async (req, res) => {
     try {
         const updatedPayment = await Payment.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -76,3 +70,54 @@ exports.deletePayment = async (req, res) => {
     }
 };
 
+
+
+// Fonction pour récupérer les paiements par utilisateur
+exports.getPaidPaymentsByUserId = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const paidPayments = await Payment.find({ user: userId, payment_status: 'paid' }).populate('tournament', 'title');
+        res.json(paidPayments);
+    } catch (error) {
+        console.error('Error fetching paid payments by user:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+exports.getPaymentByTournamentId = async (req, res) => {
+    const tournamentId = req.params.tournamentId;
+
+    try {
+        const payment = await Payment.findOne({ tournament: tournamentId });
+        res.json(payment);
+    } catch (error) {
+        console.error('Error fetching payment by tournament id:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
+exports.sendMessage = async (req, res) => {
+
+    try {
+        const to = req.body.phone;
+
+        const message = await client.messages.create({
+            from: "+17125264912",
+            to: to,
+            body: " Thank you for your payment. Your transaction was successful. ",
+        });
+
+        console.log("Message has been sent:", message.sid);
+
+        res.status(200).send("Message sent successfully");
+    } catch (err) {
+        console.error("Error sending message:", err);
+
+        res.status(500).send("Failed to send message");
+    }
+
+};
