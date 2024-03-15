@@ -2,6 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
+const backendURL = 'http://localhost:3000';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,4 +14,5 @@ const storage = multer.diskStorage({
     }
 });
 
-module.exports = multer({ storage })
+
+module.exports =  multer({ storage }) ;

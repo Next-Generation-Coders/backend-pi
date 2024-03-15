@@ -16,6 +16,7 @@ const cookieParser = require('cookie-parser') ;
 app.use(Bodyparser.json());
 app.use(cors());
 app.use(cookieParser())
+require('dotenv').config()
 
 //session
 app.use(
@@ -36,7 +37,7 @@ app.use("/", googleAuth);
 
 
 app.use(Bodyparser.json())
-require('dotenv').config() 
+require('dotenv').config()
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
@@ -54,6 +55,9 @@ app.use("/Payment", PaymentRouter);
 // complaint Routes
 const ComplaintRouter = require("./routes/Complaint");
 app.use("/api", ComplaintRouter);
+// Generate network avatars
+app.use('/uploads/avatar', express.static('uploads/avatar'));
+
 const MatchRouter = require("./routes/Match");
 app.use("/Match", MatchRouter);
 

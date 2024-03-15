@@ -66,7 +66,7 @@ const User = new Schema({
     googleId:String,
     avatar:{
         type:String,
-        default:null
+        default:"http://localhost:3000/placeholder.webp"
     },
     country:{
         label:{

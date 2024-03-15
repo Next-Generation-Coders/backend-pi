@@ -5,6 +5,7 @@ const mailer = require('../config/nodemailer');
 const bcrypt = require("bcrypt");
 const asyncHandler = require('express-async-handler')
 const templateMail = require('../config/templateMail.js');
+const multer = require('../config/multer')
 
 
 //                  =================================================
@@ -18,7 +19,6 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.login(email, password)
         user.password = '';
-        user._id = '';
 
         const accessToken = jwt.sign(
             {
@@ -258,8 +258,7 @@ const resetPassword = async (req, res) => {
 
 async function toggleBlockUser(req, res) {
     try {
-        const {_id} = req.body.id;
-
+        const _id = req.body._id;
         const userToBlock = await User.findById(_id);
 
         userToBlock.isBlocked = !userToBlock.isBlocked;
@@ -306,6 +305,7 @@ async function updateUserProfile(req, res)  {
             process.env.ACCESS_TOKEN_SECRET,
             {expiresIn: '15m'}
         )
+
         // Create a refresh token
         const refreshToken = jwt.sign(
             {
@@ -376,10 +376,10 @@ async function getUserByEmail(req, res) {
 async function saveAvatar(req, res) {
     try {
         const user = req.user
-        user.avatar = req.file.filename;
+        user.avatar = "http://localhost:3000/uploads/avatar/"+req.file.filename;
         await User.findByIdAndUpdate(user._id, user);
         const u = await User.findById(user._id);
-        res.status(200).json({message: u.fullname + " Your avatar uploaded successfully!"})
+        res.status(200).json({message: u.fullname + ", Your avatar uploaded successfully!"})
 
     } catch (error) {
         console.error('Error uploading avatar:', error.message);
@@ -486,6 +486,7 @@ async function getPlayersByIds(playerIds) {
         console.error(error);
         return [];
     }
+
 }
 
 async function getByEmail(req, res) {
