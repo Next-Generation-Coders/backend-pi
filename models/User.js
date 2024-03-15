@@ -5,13 +5,24 @@ const validator = require('validator')
 
 const Schema = mongo.Schema
 
+// USER : 10
+// PLAYER : 11
+// COACH : 12
+// ORGANIZER : 13
+
+// REFEREE : 20
+// TEAM MANAGER : 21
+
+// ADMIN : 30
+
 const Role = {
-    COACH: 'COACH',
-    PLAYER: 'PLAYER',
-    REFEREE: 'REFEREE',
-    ORGANIZER : 'ORGANIZER',
-    USER : 'USER',
-    ADMIN : 'ADMIN'
+    COACH: 12,
+    PLAYER: 11,
+    REFEREE: 20,
+    ORGANIZER : 13,
+    USER : 10,
+    ADMIN : 30,
+    TEAM_MANAGER: 21
   };
 
 const User = new Schema({
@@ -25,7 +36,7 @@ const User = new Schema({
         default:false
     },
     roles : [{
-        type : String,
+        type : Number,
         enum : Object.values(Role),
         default : Role.USER
     }],
@@ -38,6 +49,10 @@ const User = new Schema({
         type: mongo.Schema.Types.ObjectId,
         ref: 'Team'
     }],
+    currentTeam: {
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'Team'
+    },
     // games played by coach and player
     games:Number ,
     // rating of player or coach
@@ -51,7 +66,7 @@ const User = new Schema({
     googleId:String,
     avatar:{
         type:String,
-        default:null
+        default:"http://localhost:3000/placeholder.webp"
     },
     country:{
         label:{

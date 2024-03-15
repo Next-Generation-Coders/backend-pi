@@ -10,14 +10,12 @@ const requireAuth = async (req, res, next) => {
     }
     const token = authorization.split(' ')[1]
     try {
-        const { _id } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-
-        req.user = await User.findById(_id)
+        const { user } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        req.user = await User.findOne({email : user.email})
         next()
 
     } catch (error) {
         res.status(401).json({error: error.message})
-        console.log(error)
     }
 }
 
@@ -34,7 +32,7 @@ const requireAdmin = async (req,res,next) => {
         const  {user}  = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         // const user = await User.findById(u._id);
         user.roles.forEach(role=>{
-            if(role === "ADMIN"){
+            if(role === 30){
                 authorized = true;
             }
         })
@@ -62,7 +60,7 @@ const requireCoach = async (req,res,next) =>{
         const { _id } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         const user = await User.findById(_id);
         user.roles.forEach(role=>{
-            if(role === "COACH"){
+            if(role === 12){
                 authorized = true;
             }
         })
@@ -90,7 +88,7 @@ const requireOrganizer = async (req,res,next)=>{
         const { _id } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         const user = await User.findById(_id);
         user.roles.forEach(role=>{
-            if(role === "ORGANIZER"){
+            if(role === 13){
                 authorized = true;
             }
         })
@@ -118,7 +116,7 @@ const requirePlayer = async (req,res,next) => {
         const  u = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         const user = await User.findById(u._id);
         user.roles.forEach(role=>{
-            if(role === "PLAYER"){
+            if(role === 11){
                 authorized = true;
             }
         })
@@ -146,7 +144,7 @@ const requireCoachAndPlayer = async (req,res,next) => {
         const { _id } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         const user = await User.findById(_id);
         user.roles.forEach(role=>{
-            if(role === "COACH" || role === "PLAYER"){
+            if(role === 12 || role === 11){
                 authorized = true;
             }
         })
@@ -176,7 +174,7 @@ const requireReferee = async (req,res,next) => {
         console.log(u);
         console.log(user);
         user.roles.forEach(role=>{
-            if(role === "REFEREE"){
+            if(role === 20){
                 authorized = true;
             }
         })

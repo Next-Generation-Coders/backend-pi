@@ -53,6 +53,9 @@ app.use("/Payment", PaymentRouter);
 // complaint Routes
 const ComplaintRouter = require("./routes/Complaint");
 app.use("/api", ComplaintRouter);
+// Generate network avatars
+app.use('/uploads/avatar', express.static('uploads/avatar'));
+
 
 // Server setup
 const PORT = 3000;
