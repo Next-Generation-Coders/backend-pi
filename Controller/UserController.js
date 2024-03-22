@@ -4,6 +4,7 @@ require('dotenv').config();
 const mailer = require('../config/nodemailer');
 const bcrypt = require("bcrypt");
 const asyncHandler = require('express-async-handler')
+const templateMail = require('../config/templateMail.js');
 
 //                  =================================================
 //                  ===================== AUTH ======================
@@ -58,8 +59,8 @@ const loginUser = async (req, res) => {
                 from: 'moatazfoudhailii@gmail.com', // sender address
                 to: email, // list of receivers
                 subject: "Confirm account", // Subject line
-                text: "Please confirm", // plain text body
-                html: "<b>Hello, confirm please</b>", // html body
+                // text: "Please confirm", // plain text body
+                html: templateMail, // html body
             });
         }
 
@@ -165,20 +166,7 @@ const refresh = (req, res) => {
                 {expiresIn: '15m'}
             )
 
-            res.json({accessToken}, {
-                user: {
-                    email: user.email,
-                    fullname: user.fullname,
-                    roles: user.roles,
-                    phone: user.phone,
-                    city: user.city,
-                    country: user.country,
-                    isBlocked: user.isBlocked,
-                    isVerified: user.isVerified,
-                    age: user.age,
-                    avatar: user.avatar
-                }
-            })
+            res.json({accessToken})
         })
     )
 }
@@ -284,15 +272,20 @@ async function toggleBlockUser(req, res) {
 }
 
 
-async function updateUserProfile(req, res) {
+async function updateUserProfile(req, res)  {
     try {
-        const usr = req.body.user;
-        const u = await User.findOne({email: usr.email})
-        u.fullname = usr.fullname;
-        u.phone = usr.phone;
-        u.age = usr.age;
-        u.city = usr.city;
-        u.country = usr.country;
+        const u = req.body.user;
+        const usr = req.user;
+        usr.fullname = u.fullname;
+        usr.age = u.age;
+        usr.phone = u.phone;
+        usr.country = u.country;
+        usr.city = u.city;
+
+        await User.findByIdAndUpdate(usr._id,usr)
+
+        const user = await User.findById(usr._id);
+
         const accessToken = jwt.sign(
             {
                 "user":
@@ -512,7 +505,7 @@ async function getByEmail(req, res) {
         }
 
         // Return the user details without sensitive information (e.g., password)
-        const {_id, fullname, age, phone, roles, teams, games, rate, position, jersyNumber, value} = user;
+        const {_id, fullname, age, phone, roles, teams, games, rate, position, jersyNumber, value,currentTeam} = user;
         res.status(200).json({
             _id,
             fullname,
@@ -525,7 +518,8 @@ async function getByEmail(req, res) {
             rate,
             position,
             jersyNumber,
-            value
+            value,
+            currentTeam
         });
     } catch (error) {
         console.error('Error fetching user by email:', error.message);

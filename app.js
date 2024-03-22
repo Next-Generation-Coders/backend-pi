@@ -62,6 +62,8 @@ app.use("/api",ResultRouter);
 const server=http.createServer(app);
 const io=require("socket.io")(server);
 
+app.use('/uploads/team', express.static('uploads/team'));
+
 // Database connection
 server.listen(3000,console.log("server is running"))
   mongo.connect(config.url ,{
