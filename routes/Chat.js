@@ -4,7 +4,6 @@ const ChatController=require('../Controller/ChatController')
 
 
 
-
 router.post('/add',ChatController.add);
 
 router.get('/getall',ChatController.getall);

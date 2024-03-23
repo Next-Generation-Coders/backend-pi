@@ -15,11 +15,11 @@ const Message = new Schema({
     sendYear : Number,
     sender : [{
         type: ObjectId,
-        ref:'user'
+        ref:'User'
     }],
     receiver : [{
         type: ObjectId,
-        ref:'user'
+        ref:'User'
     }]
 })
 

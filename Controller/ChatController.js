@@ -1,8 +1,16 @@
 //je change le nom de l'entité ici et partout
 const Chat = require('../models/Chat')
-let chatSocket = require('../config/chatSocket');
 
 
+async function test (io){
+    // console.log(req.body)
+    try{
+        io.emit('sent','Hello again!')
+        console.log('emitted sent!')
+    } catch (err){
+        console.log('error:',err.message)
+    }
+}
 
 
 // ====================================================================================
@@ -90,4 +98,4 @@ async function deletechat (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deletechat}
+module.exports={add,getall,getbyid,getbyname,update,deletechat,test}

@@ -13,8 +13,7 @@ const config = require('./config/dbconfig.json');
 const cookieParser = require('cookie-parser') ;
 const stripe = require("stripe")("sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUqfXgls0HWLwNFa3ia10KP0VEgBH7lNBzx5QRX0obVbd3tfK9tS6f00vEmRLwkg");
 const stripeWebhookSecret = "whsec_DkhMYus3KybNiTsCJ5SlJO3a39ZN0ShO";
-let chatSocket = require('./config/chatSocket');
-
+const chatController = require('./Controller/ChatController')
 // Middleware
 app.use(Bodyparser.json());
 app.use(cors());
@@ -54,6 +53,9 @@ app.use("/Payment", PaymentRouter);
 
 const NotificationRouter = require("./routes/Notification");
 app.use("/Notification", NotificationRouter);
+
+const ChatRouter = require("./routes/Chat");
+app.use("/chat", ChatRouter);
 
 // complaint Routes
 const ComplaintRouter = require("./routes/Complaint");
@@ -116,9 +118,11 @@ server.listen(3000,console.log("server is running"))
       useNewUrlParser:true,
   }).then (()=> console.log("database connected")).catch(()=>console.log("error with db connection "));
 
+
+
+//WebSockets:
 io.on("connection", (socket) => {
     console.log('Client connected');
-
     socket.on('goal', async ({ team }) => {
         try {
             // Update match data in the database based on the team that scored
@@ -248,9 +252,10 @@ io.on("connection", (socket) => {
     }
   }
   );
-
-
-
+    socket.on('message',data=>{
+        console.log('Data received:',data);
+        chatController.test(io);
+    })
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     });

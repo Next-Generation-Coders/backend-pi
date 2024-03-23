@@ -1,18 +1,14 @@
-const mongo = require('mongoose');
-const User = require('./User');
-const Message = require('./Message');
+const mongoose = require('mongoose');
 
-const Schema = mongo.Schema
+const chatSchema = new mongoose.Schema({
 
-const Chat = new Schema({
-    users : [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+    type: { type: String, required: true, enum: ['one-on-one', 'group'] },
+    messages: [{
+        sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        message: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
     }],
-    messages : [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'message'
-    }]
-})
+});
 
-module.exports = mongo.model('chat',Chat);
+module.exports = mongoose.model('Chat', chatSchema);
