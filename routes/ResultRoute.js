@@ -83,18 +83,18 @@ router.get('/teams/:matchId', async (req, res) => {
 
   try {
     // Find the match by match ID
-    const match = await Match.findById(matchId);
+    const team1 = await Match.findById(matchId).populate('team1');
+    const team2 = await Match.findById(matchId).populate('team2');
 
-    if (!match) {
+    if (!team1 && !team2) {
       return res.status(404).json({ message: 'Match not found for the given match ID' });
     }
 
     // Extract the team information from the match
-    const team1 = match.team1.name;
-    const team2 = match.team2.name;
+  
 
     // Send the teams as JSON response
-    res.json({ team1, team2 });
+    res.json({team1,team2});
   } catch (error) {
     console.error('Error fetching teams:', error);
     res.status(500).json({ error: 'Internal server error' });
