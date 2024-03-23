@@ -13,6 +13,8 @@ const config = require('./config/dbconfig.json');
 const cookieParser = require('cookie-parser') ;
 const stripe = require("stripe")("sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUqfXgls0HWLwNFa3ia10KP0VEgBH7lNBzx5QRX0obVbd3tfK9tS6f00vEmRLwkg");
 const stripeWebhookSecret = "whsec_DkhMYus3KybNiTsCJ5SlJO3a39ZN0ShO";
+let chatSocket = require('./config/chatSocket');
+
 // Middleware
 app.use(Bodyparser.json());
 app.use(cors());
@@ -103,6 +105,9 @@ app.use("/Match", MatchRouter);
 app.use("/api",ResultRouter);
 const server=http.createServer(app);
 const io=require("socket.io")(server);
+chatSocket=io;
+// Generate network avatars
+app.use('/uploads/avatar', express.static('uploads/avatar'));
 
 // Database connection
 server.listen(3000,console.log("server is running"))

@@ -5,7 +5,7 @@ const mailer = require('../config/nodemailer');
 const bcrypt = require("bcrypt");
 const asyncHandler = require('express-async-handler')
 const templateMail = require('../config/templateMail.js');
-const multer = require('../config/multer')
+
 
 //                  =================================================
 //                  ===================== AUTH ======================
@@ -18,6 +18,7 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.login(email, password)
         user.password = '';
+        user._id = '';
 
         const accessToken = jwt.sign(
             {
@@ -304,7 +305,6 @@ async function updateUserProfile(req, res)  {
             process.env.ACCESS_TOKEN_SECRET,
             {expiresIn: '15m'}
         )
-
         // Create a refresh token
         const refreshToken = jwt.sign(
             {
@@ -374,15 +374,43 @@ async function getUserByEmail(req, res) {
 
 async function saveAvatar(req, res) {
     try {
-        const user = req.user
-        user.avatar = "http://localhost:3000/uploads/avatar/"+req.file.filename;
-        await User.findByIdAndUpdate(user._id, user);
-        const u = await User.findById(user._id);
-        res.status(200).json({message: u.fullname + ", Your avatar uploaded successfully!"})
+        const u = req.user
+        console.log(req.file.filename);
+        u.avatar = "http://localhost:3000/uploads/avatar/"+req.file.filename;
+        await User.findByIdAndUpdate(u._id, u);
+        const user = await User.findById(u._id);
+        const accessToken = jwt.sign(
+            {
+                "user":
+                    {
+                        email: user.email,
+                        fullname: user.fullname,
+                        roles: user.roles,
+                        phone: user.phone,
+                        city: user.city,
+                        country: user.country,
+                        isBlocked: user.isBlocked,
+                        isVerified: user.isVerified,
+                        age: user.age,
+                        avatar: user.avatar
+                    }
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            {expiresIn: '15m'}
+        )
+        res.status(200).json({accessToken})
 
     } catch (error) {
         console.error('Error uploading avatar:', error.message);
         res.status(401).send({error: error.message});
+    }
+}
+
+async function saveGoogleAvatar(user,pic) {
+    try {
+        user.avatar = pic;
+    } catch (error) {
+        console.log("In method userController.saveGoogleAvatar : ",error.message);
     }
 }
 
@@ -394,7 +422,6 @@ async function saveAvatar(req, res) {
 
 async function add(req, res) {
     try {
-        console.log(req.body);
         const user = new User(req.body);
         const savedUser = await user.save();
         res.status(200).json(savedUser);
@@ -469,7 +496,7 @@ async function deleteUser(req, res) {
 
 async function getallPlayers(req, res) {
     try {
-        const data = await User.find({role: 11});
+        const data = await User.find({role: 'PLAYER'});
         res.status(200).send(data);
     } catch (err) {
         res.status(400).json({error: err});
@@ -479,25 +506,16 @@ async function getallPlayers(req, res) {
 
 async function getPlayersByIds(playerIds) {
     try {
-        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');;
-        return players.map(player => ({
-            id :player._id,
-            fullname: player.fullname,
-            jersyNumber: player.jersyNumber,
-            position: player.position,
-            
-        }));
-        
+        const players = await User.find({_id: {$in: playerIds}});
+        return players.map(player => `${player.fullname} (${player.position})`); // Assuming the player name field is "fullname"
     } catch (error) {
         console.error(error);
         return [];
     }
-
 }
 
 async function getByEmail(req, res) {
     const {email} = req.query;
-    console.log(email);
     try {
         const user = await User.findOne({email});
 
@@ -526,7 +544,6 @@ async function getByEmail(req, res) {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
-
 async function getallPlayersWithNoTeam(req, res) {
     try {
         const data = await User.find({ roles: 11, currentTeam: null});
@@ -566,6 +583,7 @@ module.exports = {
     getallPlayers,
     getPlayersByIds,
     getByEmail,
-    getallPlayersWithNoTeam,
-    getallCoachesWithNoTeam
+    saveGoogleAvatar,
+    getallCoachesWithNoTeam,
+    getallPlayersWithNoTeam
 }

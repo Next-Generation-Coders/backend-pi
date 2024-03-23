@@ -1,5 +1,13 @@
 //je change le nom de l'entité ici et partout
 const Chat = require('../models/Chat')
+let chatSocket = require('../config/chatSocket');
+
+
+
+
+// ====================================================================================
+//  ===================================== CRUD =======================================
+// ====================================================================================
 
 async function add (req,res){
     console.log(req.body)

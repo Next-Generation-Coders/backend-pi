@@ -59,7 +59,7 @@ const User = new Schema({
     rate:Number ,
     // for player
     position:String ,
-    jersyNumber:Number ,
+    jerseyNumber:Number ,
     //parseFloat to chnage it to float
     value:String,
     secret:String,
@@ -139,7 +139,7 @@ User.statics.signup = async function(email, password,phone,fullname,age) {
 
 User.statics.signupPlayer = async function(email, password,phone,fullname,age,position,jerseyNumber) {
 
-    if (!email || !password || !phone || !fullname || !age) {
+    if (!email || !password || !phone || !fullname || !age || !position || !jerseyNumber) {
         throw Error('All fields must be filled')
     }
     if (!validator.isEmail(email)) {
