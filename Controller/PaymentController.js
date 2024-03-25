@@ -2,7 +2,7 @@ const Payment = require("../models/Payment");
 require('dotenv').config();
 //twilio
 const accountSid=process.env.TWILIOID
-const authToken='79218cf2d27e323d1dd05f6687e902b3'
+const authToken='ec332010f5f4256f8d55247cd9e299ef'
 const client =require('twilio')(accountSid,authToken);
 
 
@@ -33,7 +33,7 @@ exports.getPaymentById = async (req, res) => {
 
 
 // Fonction pour créer un nouveau paiement
-exports.createPayment = async (req, res) => {
+/*exports.createPayment = async (req, res) => {
     const payment = new Payment({
         user: req.body.user,
         tournament: req.body.tournament,
@@ -50,6 +50,36 @@ exports.createPayment = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+*/
+
+exports.createPayment = async (req, res) => {
+    const { user, tournament, amount, addressesMatch } = req.body;
+
+    const payment = new Payment({
+        user,
+        tournament,
+        amount,
+        subtotal: amount,
+        total: amount,
+        payment_status: 'unpaid',
+        paymentDate: new Date(),
+
+    });
+
+    try {
+        const newPayment = await payment.save();
+
+        if (addressesMatch) {
+            newPayment.payment_status = 'paid';
+            await newPayment.save();
+        }
+
+        res.status(201).json({ payment: newPayment, addressesMatch });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 
 exports.updatePayment = async (req, res) => {
     try {
@@ -106,7 +136,7 @@ exports.sendMessage = async (req, res) => {
         const to = req.body.phone;
 
         const message = await client.messages.create({
-            from: "+17125264912",
+            from: "+17073614179",
             to: to,
             body: " Thank you for your payment. Your transaction was successful. ",
         });

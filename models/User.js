@@ -87,6 +87,10 @@ const User = new Schema({
             type:String,
             default:null
         },
+    },
+    addressWallet: {
+        type: String,
+        default: null
     }
 
 })

@@ -13,7 +13,7 @@ const axios = require('axios');
 // Routes pour les paiements
 router.get('/', getAllPayments);
 router.get('/:id',getPaymentById);
-router.post('/', createPayment);
+router.post('/createPayment', createPayment);
 router.put('/:id', updatePayment);
 router.delete('/:id', deletePayment);
 router.post('/checkout-success', sendMessage);
