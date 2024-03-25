@@ -33,7 +33,9 @@ const loginUser = async (req, res) => {
                         isBlocked: user.isBlocked,
                         isVerified: user.isVerified,
                         age: user.age,
-                        avatar: user.avatar
+                        avatar: user.avatar,
+                        addressWallet:user.addressWallet
+
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
