@@ -123,6 +123,8 @@ server.listen(3000,console.log("server is running"))
 //WebSockets:
 io.on("connection", (socket) => {
     console.log('Client connected');
+
+
     socket.on('goal', async ({ team }) => {
         try {
             // Update match data in the database based on the team that scored
@@ -252,9 +254,8 @@ io.on("connection", (socket) => {
     }
   }
   );
-    socket.on('message',data=>{
-        console.log('Data received:',data);
-        chatController.test(io);
+    socket.on('message',async (data)=>{
+        await chatController.sendMessage(io,data);
     })
     socket.on('disconnect', () => {
         console.log('Client disconnected');
