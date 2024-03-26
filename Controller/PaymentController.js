@@ -9,7 +9,7 @@ const client =require('twilio')(accountSid,authToken);
 
 exports.getAllPayments = async (req, res) => {
     try {
-        const payments = await Payment.find().populate('user', 'fullname email').populate('tournament', 'title');
+        const payments = await Payment.find().populate('user', 'fullname email addressWallet').populate('tournament', 'title');
         res.json(payments);
     } catch (error) {
         console.error('Error fetching payments:', error);
@@ -53,10 +53,11 @@ exports.getPaymentById = async (req, res) => {
 */
 
 exports.createPayment = async (req, res) => {
-    const { user, tournament, amount, addressesMatch } = req.body;
+    const { tournament, amount, addressesMatch } = req.body;
+    const user = req.body.userId;
 
     const payment = new Payment({
-        user,
+        user: user,
         tournament,
         amount,
         subtotal: amount,
