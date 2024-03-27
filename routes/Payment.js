@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllPayments ,getPaymentById,createPayment,updatePayment,deletePayment,sendMessage,getPaidPaymentsByUserId,getPaymentByTournamentId} = require('../Controller/PaymentController');
+const { getAllPayments ,getPaymentById,createPayment,updatePayment,deletePayment,sendMessage,getPaymentsByUserId,getPaymentByTournamentId} = require('../Controller/PaymentController');
 //const { createStripePaymentSession, handleStripePaymentEvent } = require('../Controller/StripeController');
 const User = require('../models/User');
 const Tournament = require('../models/Tournament');
@@ -17,7 +17,7 @@ router.post('/createPayment', createPayment);
 router.put('/:id', updatePayment);
 router.delete('/:id', deletePayment);
 router.post('/checkout-success', sendMessage);
-router.get('/user/:userId', getPaidPaymentsByUserId);
+router.get('/user/:userId', getPaymentsByUserId);
 router.get('/byTournamentId/:tournamentId', getPaymentByTournamentId);
 router.post("/create-checkout-session", async (req, res) => {
   try {

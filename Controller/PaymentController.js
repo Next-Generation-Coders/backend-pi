@@ -104,18 +104,17 @@ exports.deletePayment = async (req, res) => {
 
 
 // Fonction pour récupérer les paiements par utilisateur
-exports.getPaidPaymentsByUserId = async (req, res) => {
+exports.getPaymentsByUserId = async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        const paidPayments = await Payment.find({ user: userId, payment_status: 'paid' }).populate('tournament', 'title');
-        res.json(paidPayments);
+        const payments = await Payment.find({ user: userId });
+        res.json(payments);
     } catch (error) {
         console.error('Error fetching paid payments by user:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 
 exports.getPaymentByTournamentId = async (req, res) => {
     const tournamentId = req.params.tournamentId;
