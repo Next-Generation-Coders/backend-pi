@@ -5,11 +5,18 @@ const mailer = require('../config/nodemailer');
 const bcrypt = require("bcrypt");
 const asyncHandler = require('express-async-handler')
 const templateMail = require('../config/templateMail.js');
-
-
+const RoleRequest = require('../models/RoleRequest')
+const Tournament = require('../models/Tournament');
+const Team = require('../models/Team')
 //                  =================================================
 //                  ===================== AUTH ======================
 //                  =================================================
+const RequestedRole = {
+    ACCEPTED:'ACCEPTED',
+    REJECTED:'REJECTED',
+    PENDING:'PENDING',
+    NEW:'NEW'
+};
 
 // login a user
 const loginUser = async (req, res) => {
@@ -18,7 +25,6 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.login(email, password)
         user.password = '';
-        user._id = '';
 
         const accessToken = jwt.sign(
             {
@@ -39,7 +45,7 @@ const loginUser = async (req, res) => {
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: '15m'}
+            {expiresIn: '60m'}
         )
 
         const refreshToken = jwt.sign(
@@ -100,7 +106,7 @@ const signupUser = async (req, res) => {
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: '15m'}
+            {expiresIn: '60m'}
         )
 
         // Create a refresh token
@@ -166,7 +172,7 @@ const refresh = (req, res) => {
                         }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn: '15m'}
+                {expiresIn: '60m'}
             )
 
             res.json({accessToken})
@@ -307,7 +313,7 @@ async function updateUserProfile(req, res)  {
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: '15m'}
+            {expiresIn: '60m'}
         )
         // Create a refresh token
         const refreshToken = jwt.sign(
@@ -353,7 +359,7 @@ async function getUserByEmail(req, res) {
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: '15m'}
+            {expiresIn: '60m'}
         )
 
         // Create a refresh token
@@ -404,7 +410,7 @@ async function saveAvatar(req, res) {
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: '15m'}
+            {expiresIn: '60m'}
         )
         res.status(200).json({accessToken})
 
@@ -421,6 +427,97 @@ async function saveGoogleAvatar(user,pic) {
         console.log("In method userController.saveGoogleAvatar : ",error.message);
     }
 }
+async function getUserRoleRequest(req, res) {
+    try {
+        const user = req.user;
+        const requests = await RoleRequest.find();
+        const userRequests = requests.filter(r => {
+            return r.user.equals(user._id);
+        });
+        if (!requests) {
+            res.status(200).json({ notfound: true });
+            return;
+        }
+
+        if (userRequests.length > 0) {
+            const request = userRequests.find(r => r.result === 'PENDING');
+            if (request && (request.result === 'PENDING')) {
+                res.status(200).json({ request });
+            } else {
+                res.status(200).json({ notfound: true });
+            }
+        } else {
+            res.status(200).json({ notfound: true });
+        }
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+}
+
+
+async function requestRole(req,res){
+    try{
+        const user = req.user;
+        const requestedRole = req.body.requestedRole;
+        const roleRequest = await RoleRequest.create({
+            user:user,
+            requestedRole:requestedRole,
+        });
+        res.status(200).json(roleRequest);
+    }catch(e){
+        res.status(400).json({error:e.message})
+    }
+}
+
+async function acceptRoleRequest(req,res){
+    try{
+        let roleRequest = req.body;
+        roleRequest.result = RequestedRole.ACCEPTED;
+        const user = await User.findById(roleRequest.user);
+        user.roles.push(roleRequest.requestedRole);
+        await User.findByIdAndUpdate(user._id,user);
+        roleRequest.user=await User.findById(user._id);
+        await RoleRequest.findByIdAndUpdate(roleRequest._id,roleRequest);
+        const result = await RoleRequest.findById(roleRequest._id);
+        res.status(200).json(result);
+    }catch(e){
+        res.status(400).json({error:e.message})
+    }
+}
+
+async function rejectRoleRequest(req,res){
+    try{
+        const roleRequest = req.body;
+        console.log(roleRequest);
+        roleRequest.result = RequestedRole.REJECTED;
+        await RoleRequest.findByIdAndUpdate(roleRequest._id,roleRequest);
+        const result = await RoleRequest.findById(roleRequest._id);
+        res.status(200).json(result);
+    }catch(e){
+        console.log("Error: "+e.message);
+        res.status(400).json({error:e.message})
+    }
+}
+
+async function getRoleRequests(req,res){
+    try{
+        const requests = await RoleRequest.find();
+        let reqs = [];
+        for(const request of requests){
+            const user = await User.findById(request.user)
+            const newRequest ={
+                _id: request._id,
+                requestedRole: request.requestedRole,
+                result: request.result,
+                user: user,
+            }
+            reqs.push(newRequest);
+        }
+        res.status(200).json(reqs);
+    }catch(e){
+        res.status(400).json({error:e.message})
+    }
+}
 
 
 //                  =================================================
@@ -428,8 +525,66 @@ async function saveGoogleAvatar(user,pic) {
 //                  =================================================
 
 
+async function getPlayerTournaments(req,res){
+    try{
+        const user = req.user;
+        const data = await Tournament.find();
+        const myTournaments = data.filter(tournament=>tournament.teams.some(team=>team._id && user.currentTeam && team._id.equals(user.currentTeam)));
+        res.status(200).json(myTournaments);
+    }catch(e){
+        res.status(400).json({error:e.message})
+    }
+}
+
+async function getTeamsByTournament(req,res){
+    try{
+        const user = req.user;
+        const id = req.params.id;
+        const tournament = await Tournament.findById(id);
+        let myTeam = {};
+        let teams = [];
+                for (const t of tournament.teams){
+                    try {
+                        const team = await Team.findById(t);
+                        if (team) {
+                            if(user.currentTeam.equals(t)){
+                                myTeam = team;
+                                teams.push(team)
+                            }else{
+                                teams.push(team);
+                            }
+                        } else {
+                            console.log(`Team with ID ${t} not found.`);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching team:', error);
+                    }
+                }
+                res.status(200).json({teams,myTeam})
+    }catch(e){
+        res.status(400).json({error:e.message})
+    }
+}
+
+async function getUsersForChat(req,res){
+    try{
+        const current = req.user;
+        const users = await User.find();
+        const resp = users.filter((user)=>user._id!==current._id).map((user) => ({
+            email: user.email,
+            fullname: user.fullname,
+        }));
+
+        res.status(200).json({data:resp});
+
+    }catch (e){
+        res.status(400).json({error:e.message})
+    }
+}
+
 async function add(req, res) {
     try {
+        console.log(req.body);
         const user = new User(req.body);
         const savedUser = await user.save();
         res.status(200).json(savedUser);
@@ -593,5 +748,13 @@ module.exports = {
     getByEmail,
     saveGoogleAvatar,
     getallCoachesWithNoTeam,
-    getallPlayersWithNoTeam
+    getallPlayersWithNoTeam,
+    getUsersForChat,
+    requestRole,
+    acceptRoleRequest,
+    rejectRoleRequest,
+    getRoleRequests,
+    getUserRoleRequest,
+    getPlayerTournaments,
+    getTeamsByTournament
 }

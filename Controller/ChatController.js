@@ -7,10 +7,13 @@ async function createNewChat(req,res){
         const user = req.user;
         const chat = req.body;
         chat.owner = user.email;
+        chat.type.toLowerCase() === ('single') ? chat.type = 'Single' : chat.type = 'Group';
         let participantsById = [];
         for (const p of chat.participants) {
-            const u = await User.findOne({email:p})
-            participantsById.push(u)
+            if(p){
+                const u = await User.findOne({email:p})
+                participantsById.push(u)
+            }
         }
         chat.participants = participantsById;
         chat.participants.push(user._id);

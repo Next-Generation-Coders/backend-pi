@@ -25,6 +25,13 @@ const Role = {
     TEAM_MANAGER: 21
   };
 
+const RequestedRole = {
+    ACCEPTED:'ACCEPTED',
+    REJECTED:'REJECTED',
+    PENDING:'PENDING',
+    NEW:'NEW'
+};
+
 const User = new Schema({
     fullname : String,
     email : String,
@@ -40,6 +47,11 @@ const User = new Schema({
         enum : Object.values(Role),
         default : Role.USER
     }],
+    requestedRole: {
+        type : String,
+        enum : Object.values(RequestedRole),
+        default : RequestedRole.NEW
+    },
     isBlocked: {
         type:Boolean,
         default : false

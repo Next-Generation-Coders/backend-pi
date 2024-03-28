@@ -7,6 +7,20 @@ const upload = require('../config/multer')
 //Auth
 router.post('/signup',UserController.signupUser);
 
+router.post('/request',tokenVerif.requireAuth,UserController.requestRole);
+
+router.put('/reject',tokenVerif.requireAdmin,UserController.rejectRoleRequest);
+
+router.put('/accept',tokenVerif.requireAdmin,UserController.acceptRoleRequest);
+
+router.get('/requests',tokenVerif.requireAdmin,UserController.getRoleRequests);
+
+router.get('/check-request',tokenVerif.requireAuth,UserController.getUserRoleRequest);
+
+router.get('/player-tournaments',tokenVerif.requireAuth,UserController.getPlayerTournaments);
+
+router.get('/player-teams/:id',tokenVerif.requireAuth,UserController.getTeamsByTournament);
+
 router.post('/login',UserController.loginUser);
 
 router.put('/verify',UserController.verifyEmail);
@@ -24,6 +38,9 @@ router.put('/profile',tokenVerif.requireAuth,UserController.updateUserProfile)
 router.put('/change-password',tokenVerif.requireAuth,UserController.changePassword)
 
 router.get('/email/:email',UserController.getUserByEmail)
+
+
+router.get('/for-chat',tokenVerif.requireAuth,UserController.getUsersForChat)
 
 router.put('/avatar',tokenVerif.requireAuth,upload.single('avatar'),UserController.saveAvatar)
 
