@@ -46,7 +46,7 @@ Router.get(
                         }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn: '15m'}
+                {expiresIn: '60m'}
             )
             res.redirect(
                 `http://localhost:3001?token=${token}`
