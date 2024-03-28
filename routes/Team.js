@@ -34,4 +34,8 @@ router.get('/getLineup/:teamId',LineupController.getLineup);
 
 router.put('/updateLineup/:teamId',LineupController.updateLineup);
 
+router.get('/getTeamRating/:id',TeamController.getTeamRating);
+
+router.get('/getTeamsByMatch/:matchId',LineupController.getTeamsByMatch);
+
 module.exports = router;

@@ -51,14 +51,10 @@ async function getall (req,res){
 
 async function getbyid (req,res){
     try{
-        const data = await Team.findById(req.params.id).populate('players')
+        const data = await Team.findById(req.params.id)
         res.status(200).send(data)
-
-
     }catch(err){
         res.status(400).json({error:err});
-
-
     }
 
 }
@@ -238,4 +234,83 @@ async function addCoachToTeam(req, res) {
 }
 
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkTeam_manager,updateXTeam,getTeambyCoach,getTeambyTeamManger,addCoachToTeam}
+async function getTeamRating(req, res) {
+    try {
+        const teamId = req.params.id;
+
+        // Fetch team data from the database
+        const team = await Team.findById(teamId);
+
+        // Perform calculations to determine the team's rating
+        let teamRating = 0;
+        let sumteamRating = 0;
+
+        // Example: Calculate average player rating
+        if (team.players && team.players.length > 0) {
+            // Fetch player objects based on their IDs
+            const playerPromises = team.players.map(async playerId => {
+                const playerResponse = await fetch(`http://localhost:3000/User/getbyid/${playerId}`);
+                return playerResponse.json();
+            });
+        
+            // Wait for all player fetch requests to resolve
+            const players = await Promise.all(playerPromises);
+        
+            // Calculate total player rating and average player rating
+            const totalPlayerRating = players.reduce((acc, player) => {
+                // Check if player.value exists and is a valid number
+                const playerValue = parseFloat(player.value);
+                if (!isNaN(playerValue)) {
+                    // Add the player's value to the accumulator
+                    return acc + playerValue;
+                } else {
+                    // Treat it as 0 if player.value is missing or not a number
+                    return acc + 0;
+                }
+            }, 0);
+            
+            const averagePlayerRating = totalPlayerRating / players.length;
+            // You can adjust the weight of player ratings based on your preference
+            teamRating += (averagePlayerRating * 0.2); // Assuming player ratings contribute 50% to the team's rating
+            sumteamRating = sumOfDigits(teamRating)/team.players.length;
+            sumteamRating = Math.min(sumteamRating, 5);
+        }
+        
+
+        /* // Example: Add points based on the number of trophies
+        if (team.trophies && team.trophies.length > 0) {
+            // You can define the points awarded for each type of trophy
+            const trophyPoints = {
+                'League Title': 10,
+                'Cup Win': 5,
+                // Add more trophy types and points as needed
+            };
+            team.trophies.forEach(trophy => {
+                teamRating += trophyPoints[trophy.type];
+            });
+        } */
+
+        // You can include other factors such as team performance, market value of players, etc.
+
+        // Return the team's rating
+        console.log(sumteamRating+"....")
+        team.rating=sumteamRating ;
+        await team.save();
+        
+        res.status(200).json({ rating: sumteamRating });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}
+
+function sumOfDigits(number) {
+    // Convert number to string
+    const numberString = number.toString();
+
+    // Split the string into an array of characters, convert each character to a number, and sum them up
+    const sum = numberString.split('').map(Number).reduce((acc, digit) => acc + digit, 0);
+
+    return sum;
+}
+
+module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkTeam_manager,updateXTeam,getTeambyCoach,getTeambyTeamManger,addCoachToTeam,getTeamRating}
