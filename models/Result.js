@@ -8,14 +8,25 @@ const Result = new Schema({
         ref: 'Match',
         required: true
       },
-      team1Goals: {
+      team1Goals: [{
+        //time: { type: String }, // Time of the goal
         type: Number,
         required: true
-      },
-      team2Goals: {
+    }],
+    team2Goals: [{
+        //time: { type: String }, // Time of the goal
         type: Number,
         required: true
-      },team1Red: {
+    }],
+      // team1Goals: {
+      //   type: Number,
+      //   required: true
+      // },
+      // team2Goals: {
+      //   type: Number,
+      //   required: true
+      // },
+      team1Red: {
         type: Number,
         default: 0      },
       team2Red: {
