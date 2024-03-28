@@ -669,8 +669,15 @@ async function getallPlayers(req, res) {
 
 async function getPlayersByIds(playerIds) {
     try {
-        const players = await User.find({_id: {$in: playerIds}});
-        return players.map(player => `${player.fullname} (${player.position})`); // Assuming the player name field is "fullname"
+        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');;
+        return players.map(player => ({
+            id :player._id,
+            fullname: player.fullname,
+            jersyNumber: player.jersyNumber,
+            position: player.position,
+            
+        }));
+        
     } catch (error) {
         console.error(error);
         return [];
@@ -687,7 +694,7 @@ async function getByEmail(req, res) {
         }
 
         // Return the user details without sensitive information (e.g., password)
-        const {_id, fullname, age, phone, roles, teams, games, rate, position, jersyNumber, value} = user;
+        const {_id, fullname, age, phone, roles, teams, games, rate, position, jersyNumber, value,currentTeam} = user;
         res.status(200).json({
             _id,
             fullname,
@@ -700,7 +707,8 @@ async function getByEmail(req, res) {
             rate,
             position,
             jersyNumber,
-            value
+            value,
+            currentTeam
         });
     } catch (error) {
         console.error('Error fetching user by email:', error.message);

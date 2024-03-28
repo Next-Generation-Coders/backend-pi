@@ -114,6 +114,8 @@ app.use('/uploads/avatar', express.static('uploads/avatar'));
 // Generate network avatars
 app.use('/uploads/avatar', express.static('uploads/avatar'));
 
+app.use('/uploads/team', express.static('uploads/team'));
+
 // Database connection
 server.listen(3000,console.log("server is running"))
   mongo.connect(config.url ,{
