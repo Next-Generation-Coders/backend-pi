@@ -1,30 +1,29 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const User = require('./User');
-const Match = require('./Match');
 
 const TeamSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-      },
+    name: String,
     logo: String,
     players: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'user'
     }],
     coach: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'user'
     },
     staff: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'user'
     }],
     matches: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Match'
-    }]
+        ref: 'match'
+    }],
+    team_manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
 });
 
 module.exports = mongoose.model('Team', TeamSchema);

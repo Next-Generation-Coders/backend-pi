@@ -1,6 +1,8 @@
 const mongo = require('mongoose');
 const User = require('./User');
 const Chat = require('./Chat');
+const { default: mongoose } = require('mongoose');
+const  ObjectId  = mongoose.Types.ObjectId;
 
 const Schema = mongo.Schema
 
@@ -11,8 +13,14 @@ const Message = new Schema({
     sendDay : Number,
     sendMonth : Number,
     sendYear : Number,
-    sender : User,
-    receiver : [User]
+    sender : [{
+        type: ObjectId,
+        ref:'User'
+    }],
+    receiver : [{
+        type: ObjectId,
+        ref:'User'
+    }]
 })
 
 module.exports = mongo.model('message',Message);
