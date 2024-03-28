@@ -71,7 +71,7 @@ const User = new Schema({
     rate:Number ,
     // for player
     position:String ,
-    jerseyNumber:Number ,
+    jersyNumber:Number ,
     //parseFloat to chnage it to float
     value:String,
     secret:String,

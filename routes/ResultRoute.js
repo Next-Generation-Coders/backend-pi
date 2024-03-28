@@ -7,7 +7,7 @@ const Team=require('../models/Team')
 
 
 // Add Team endpoint
-router.post('/teams', async (req, res) => {
+router.post('/team', async (req, res) => {
   try {
     const { name } = req.body;
     const team = new Team({ name });

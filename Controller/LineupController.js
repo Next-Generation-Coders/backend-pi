@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Lineup = require('../models/Lineup'); // Assuming you have a Lineup model
+const Match = require('../models/Match'); // Assuming you have a Lineup model
 
 // POST request to save lineup data
 async function add(req, res)  {
@@ -8,6 +9,7 @@ async function add(req, res)  {
     try{
         const lineup= new Lineup(req.body)
         lineup.team=req.body.team ;
+        lineup.players=req.body.players;
         const savedLineup = await lineup.save();
         /* console.log(savedLineup) */
         res.status(201).json({ success: true, lineup: savedLineup });
@@ -52,4 +54,27 @@ async function updateLineup(req, res) {
     }
 }
 
-module.exports ={add,getLineup,updateLineup};
+async function getTeamsByMatch(req, res) {
+    const matchId = req.params.matchId;
+
+    try {
+        const match = await Match.findById(matchId);
+
+        if (!match) {
+            return res.status(404).json({ success: false, error: 'Match not found' });
+        }
+
+        const team1Id = match.team1;
+        const team2Id = match.team2;
+
+        const team1Lineup = await Lineup.findOne({ team: team1Id });
+        const team2Lineup = await Lineup.findOne({ team: team2Id });
+
+        res.status(200).json({  team1Lineup, team2Lineup });
+    } catch (error) {
+        console.error('Error fetching teams by match:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch teams by match' });
+    }
+}
+
+module.exports ={add,getLineup,updateLineup,getTeamsByMatch};
