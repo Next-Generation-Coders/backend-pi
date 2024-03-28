@@ -28,10 +28,12 @@ const io=require("socket.io")(server);
 io.on("connection", (socket) => {
   console.log('Client connected');
 
-  socket.on('goal', async ({ team }) => {
+  socket.on('goal', async ({ team,matchID }) => {
     try {
       // Update match data in the database based on the team that scored
-      const result = await Result.findOne().populate('match');
+      console.log(matchID)
+      const result = await Result.findOne( {match: matchID}).populate('match');
+
       if (!result) {
         throw new Error('Match not found');
       }
@@ -39,10 +41,14 @@ io.on("connection", (socket) => {
       if (team === 'team1') { 
         console.log("team1 goal")
         result.team1Goals++;
+        //result.team1Goals.push({ time }); // Store the time of the goal
+
       } else if (team === 'team2') {
         console.log("team2 goal")
 
         result.team2Goals++;
+        //result.team2Goals.push({ time }); // Store the time of the goal
+
       }
 
       await result.save();
@@ -53,10 +59,11 @@ io.on("connection", (socket) => {
       console.error('Error:', error.message);
     }
   } );
-  socket.on('red', async ({ team }) => {
+
+  socket.on('red', async ({ team,matchID }) => {
     try {
       // Update match data in the database based on the team that scored
-      const result = await Result.findOne().populate('match');
+      const result = await Result.findOne({match: matchID}).populate('match');
       if (!result) {
         throw new Error('Match not found');
       }
@@ -79,10 +86,10 @@ io.on("connection", (socket) => {
     }
   }
   );
-  socket.on('yellow', async ({ team }) => {
+  socket.on('yellow', async ({ team,matchID }) => {
     try {
       // Update match data in the database based on the team that scored
-      const result = await Result.findOne().populate('match');
+      const result = await Result.findOne({match: matchID}).populate('match');
       if (!result) {
         throw new Error('Match not found');
       }
@@ -105,10 +112,10 @@ io.on("connection", (socket) => {
     }
   }
   );
-  socket.on('corners', async ({ team }) => {
+  socket.on('corners', async ({ team,matchID }) => {
     try {
       // Update match data in the database based on the team that scored
-      const result = await Result.findOne().populate('match');
+      const result = await Result.findOne({match: matchID}).populate('match');
       if (!result) {
         throw new Error('Match not found');
       }
@@ -131,10 +138,10 @@ io.on("connection", (socket) => {
     }
   }
   );
-  socket.on('offsides', async ({ team }) => {
+  socket.on('offsides', async ({ team,matchID }) => {
     try {
       // Update match data in the database based on the team that scored
-      const result = await Result.findOne().populate('match');
+      const result = await Result.findOne({match: matchID}).populate('match');
       if (!result) {
         throw new Error('Match not found');
       }
