@@ -283,6 +283,7 @@ async function updateUserProfile(req, res)  {
         usr.phone = u.phone;
         usr.country = u.country;
         usr.city = u.city;
+        usr.addressWallet=u.addressWallet;
 
         await User.findByIdAndUpdate(usr._id,usr)
 
@@ -301,7 +302,8 @@ async function updateUserProfile(req, res)  {
                         isBlocked: user.isBlocked,
                         isVerified: user.isVerified,
                         age: user.age,
-                        avatar: user.avatar
+                        avatar: user.avatar,
+                        addressWallet:user.addressWallet
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
@@ -345,7 +347,9 @@ async function getUserByEmail(req, res) {
                         isBlocked: user.isBlocked,
                         isVerified: user.isVerified,
                         age: user.age,
-                        avatar: user.avatar
+                        avatar: user.avatar,
+                        addressWallet:user.addressWallet
+
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
@@ -394,7 +398,9 @@ async function saveAvatar(req, res) {
                         isBlocked: user.isBlocked,
                         isVerified: user.isVerified,
                         age: user.age,
-                        avatar: user.avatar
+                        avatar: user.avatar,
+                        addressWallet:user.addressWallet
+
                     }
             },
             process.env.ACCESS_TOKEN_SECRET,
