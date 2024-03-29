@@ -10,7 +10,7 @@ module.exports={
     output:{
         path : path.join(__dirname,'dist'),
         publicPath:'/',
-        filename: '[name].js',
+        filename: 'main.js',
         clean:true
     },
 
@@ -30,6 +30,16 @@ module.exports={
                 }
             }
         ]
+    },
+    externals: {
+        '@mapbox/node-pre-gyp': 'commonjs @mapbox/node-pre-gyp',
+        'bcrypt': 'commonjs bcrypt',
+        'express': 'commonjs express',
+        'mongoose': 'commonjs mongoose',
+        'ws': 'commonjs ws',
+        'mock-aws-s3': 'commonjs mock-aws-s3',
+        'aws-sdk': 'commonjs aws-sdk',
+        'nock': 'commonjs nock'
     }
 
 }
