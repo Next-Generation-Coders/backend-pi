@@ -3,7 +3,7 @@ WORKDIR ./lutback
 COPY package*.json ./lutback
 COPY . .
 RUN npm i nodemon --force
-RUN npm install
+RUN npm install --force
 #=======
 #COPY package*.json /app
 #RUN npm install nodemon
