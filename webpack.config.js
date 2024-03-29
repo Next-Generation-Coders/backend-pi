@@ -8,9 +8,7 @@ module.exports={
     },
 
     output:{
-
         path : path.join(__dirname,'dist'),
-
         publicPath:'/',
         filename: '[name].js',
         clean:true
@@ -20,12 +18,16 @@ module.exports={
     target:'node',
 
     module: {
-
         rules: [
             {
                 test:/\.js$/,
                 exclude:/node_modules/,
-                loader:"babel-loader"
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    },
+                }
             }
         ]
     }
