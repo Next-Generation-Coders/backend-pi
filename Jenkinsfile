@@ -18,10 +18,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def scannerHome = tool 'scanner';
-                        withSonarQubeEnv() {
-                          sh "${scannerHome}/bin/sonar-scanner"
-                        }
+                    def scannerHome = tool 'scanner'
+                    withSonarQubeEnv {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
@@ -29,6 +29,13 @@ pipeline {
             steps {
                 script {
                     sh 'npm run build'
+                }
+            }
+        }
+        stage('Building image') {
+            steps {
+                script {
+                    sh('docker-compose build')
                 }
             }
         }
