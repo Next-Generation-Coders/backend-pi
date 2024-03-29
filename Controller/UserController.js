@@ -140,8 +140,10 @@ const signupUser = async (req, res) => {
 
 const refresh = (req, res) => {
     const cookies = req.cookies
-
-    if (!cookies?.jwt) return res.status(401).json({message: 'You need to login'})
+    if (!cookies || !cookies.jwt) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    if (!cookies.jwt) return res.status(401).json({message: 'You need to login'})
 
     const refreshToken = cookies.jwt
 
@@ -183,9 +185,11 @@ const refresh = (req, res) => {
 const checkRoles = async (req, res) => {
 
     const cookies = req.cookies
-    if (!cookies?.jwt) return res.status(401).json({message: 'Unauthorized'})
+    if (!cookies || !cookies.jwt) {
+        return res.status(401).json({ message: 'You need to login' });
+    }
     jwt.verify(
-        cookies?.jwt,
+        cookies.jwt,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.status(403).json({message: 'Forbidden'})
@@ -669,7 +673,7 @@ async function getallPlayers(req, res) {
 
 async function getPlayersByIds(playerIds) {
     try {
-        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');;
+        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');
         return players.map(player => ({
             id :player._id,
             fullname: player.fullname,

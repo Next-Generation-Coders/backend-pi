@@ -31,7 +31,7 @@ module.exports = () => {
                         email: profile.emails[0].value,
                         pic: profile.photos[0].value,
                         secret: accessToken,
-                        isVerified:profile._json.email_verified,
+                        verified:profile._json.email_verified,
                     };
                     const result = await UserModel.findOneAndUpdate(
                         { _id: user._id },

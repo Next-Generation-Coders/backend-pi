@@ -6,6 +6,7 @@ async function createNewChat(req,res){
     try{
         const user = req.user;
         const chat = req.body;
+        console.log(chat);
         chat.owner = user.email;
         chat.type.toLowerCase() === ('single') ? chat.type = 'Single' : chat.type = 'Group';
         let participantsById = [];
