@@ -47,8 +47,8 @@ pipeline {
                 script {
                     try {
                         docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
-                            sh "docker tag backed-pipe_main_node_app:latest ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
-                            sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
+                            sh "docker tag backed-pipe_main_node_app:latest 197.26.204.208:8083/backed-pipe_main_node_app:latest"
+                            sh "docker push 197.26.204.208:8083/backed-pipe_main_node_app:latest"
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
