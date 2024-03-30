@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-        nexusRepoUrl = "197.26.204.208:8083"
+        registryCredentials = "nexus"
+        registry = "197.26.204.208:8083"
     }
     stages {
         stage('Install dependencies') {
@@ -45,19 +46,13 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 script {
-                    try {
-                        docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
-                            sh "docker tag backed-pipe_main_node_app:latest 197.26.204.208:8083/backed-pipe_main_node_app:latest"
-                            sh "docker push 197.26.204.208:8083/backed-pipe_main_node_app:latest"
-                        }
-                    } catch (Exception e) {
-                        echo "Error occurred during Docker push:"
-                        echo e.getMessage()
-                        echo e.getStackTrace().join('\n')
-                        error "Failed to push Docker image to Nexus"
+                    docker.withRegistry("http://" + registry, registryCredentials) {
+                        sh('docker push $registry/nodemongoapp:5.0')
                     }
                 }
             }
         }
+
+
     }
 }
