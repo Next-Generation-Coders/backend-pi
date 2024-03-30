@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
             nexusCredentials = credentials('nexus')
-            nexusRepoUrl = "http://197.26.204.208:8082/repository/docker-repo/"
+            nexusRepoUrl = "197.26.204.208:8082/repository/docker-repo/"
         }
     stages {
         stage('Install dependencies') {
@@ -47,7 +47,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        docker.withRegistry(nexusRepoUrl, "docker-registry-credentials") {
+                        docker.withRegistry("http://"+nexusRepoUrl, "docker-registry-credentials") {
                             sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:1.0"
                         }
                     } catch (Exception e) {
