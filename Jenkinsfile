@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        registryCredentials = "nexus"
+        registry = "172.18.0.1:8083"
+    }
     stages {
         stage('Install dependencies') {
             steps {
@@ -36,6 +40,15 @@ pipeline {
             steps {
                 script {
                     sh('docker-compose build')
+                }
+            }
+        }
+        stage('Deploy to Nexus') {
+            steps {
+                script {
+                    docker.withRegistry("http://${registry}", registryCredentials) {
+                        sh "docker push ${registry}/backend-pi:1.0"
+                    }
                 }
             }
         }
