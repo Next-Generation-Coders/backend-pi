@@ -46,11 +46,20 @@ environment {
         stage('Deploy to Nexus') {
             steps {
                 script {
-                    docker.withRegistry("http://${registry}", registryCredentials) {
-                        sh "docker push ${registry}/backend-pi:1.0"
+                    try {
+                        docker.withRegistry("http://${registry}", registryCredentials) {
+                            sh "docker push ${registry}/backend-pi:1.0"
+                        }
+                    } catch (Exception e) {
+                        echo "Error occurred during Docker push:"
+                        echo e.getMessage()
+                        echo e.getStackTrace().join('\n')
+                        // Mark the build as failed
+                        error "Failed to push Docker image to Nexus"
                     }
                 }
             }
         }
+
     }
 }
