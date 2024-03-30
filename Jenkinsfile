@@ -1,9 +1,9 @@
 pipeline {
-environment {
-        registryCredentials = credentials('nexus')
-        registry = "127.0.0.1:8083"
-    }
     agent any
+    environment {
+            registryCredentials = credentials('nexus')
+            registry = "127.0.0.1:8083"
+        }
     stages {
         stage('Install dependencies') {
             steps {
@@ -52,8 +52,8 @@ environment {
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
-                        echo e
-                        echo e.getStackTrace().join('\n')
+                        echo e.getMessage()  // Print the error message
+                        echo e.getStackTrace().join('\n')  // Print the stack trace for debugging
                         // Mark the build as failed
                         error "Failed to push Docker image to Nexus"
                     }
