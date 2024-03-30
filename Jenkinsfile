@@ -63,7 +63,20 @@ pipeline {
                 }
             }
         }
-
+        stage('Run Prometheus') {
+            steps {
+                script {
+                    sh('docker run -d --name prometheus -p 9090:9090 prom/prometheus')
+                }
+            }
+        }
+        stage('Run Grafana') {
+            steps {
+                script {
+                    sh('docker run -d --name grafana -p 5000:3000 grafana/grafana')
+                }
+            }
+        }
 
     }
 }
