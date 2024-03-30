@@ -47,27 +47,13 @@ pipeline {
                 script {
                     try {
                         docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
-                        try{
-                            sh "docker tag backed-pipe_main_node_app:latest ${nexusRepoUrl}/${imageName}:${tag}"
-                            }catch(Exception e){
-                                echo "Error occurred during Docker push:"
-                                echo e.getMessage()
-                                echo e.getStackTrace()
-                                error "Failed to push Docker image to Nexus"
-                            }
-                            try{
-                                sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
-                            }catch(Exception e){
-                                echo "Error occurred during Docker push:"
-                                echo e.getMessage()
-                                echo e.getStackTrace()
-                                error "Failed to push Docker image to Nexus"
-                            }
+                            sh "docker tag backed-pipe_main_node_app:latest ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
+                            sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
                         echo e.getMessage()
-                        echo e.getStackTrace()
+                        echo e.getStackTrace().join('\n')
                         error "Failed to push Docker image to Nexus"
                     }
                 }
