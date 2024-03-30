@@ -3,7 +3,7 @@ pipeline {
     environment {
             dockerCredentials = credentials('docker-registry-credentials')
             nexusCredentials = credentials('nexus')
-            nexusRepoUrl = "197.26.204.208:8082/repository/docker-repo/"
+            nexusRepoUrl = "http://197.26.204.208:8082/repository/docker-repo/"
         }
     stages {
         stage('Install dependencies') {
