@@ -49,14 +49,13 @@ pipeline {
                 script {
                     try {
                         echo dockerCredentials
-                        docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
+                        docker.withRegistry("http://"+nexusRepoUrl, "docker-registry-credentials") {
                             sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:1.0"
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
-                        echo e.getMessage()  // Print the error message
-                        echo e.getStackTrace().join('\n')  // Print the stack trace for debugging
-                        // Mark the build as failed
+                        echo e.getMessage()
+                        echo e.getStackTrace().join('\n')
                         error "Failed to push Docker image to Nexus"
                     }
                 }
