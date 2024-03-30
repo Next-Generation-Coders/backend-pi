@@ -735,7 +735,25 @@ async function getallCoachesWithNoTeam(req, res) {
     } catch (err) {
         res.status(400).json({error: err});
     }
-}
+};
+
+async function getAllReferees (req, res) {
+    try {
+        
+        const referees = await User.find({ roles: 20 });
+
+        if (!referees) {
+            return res.status(404).json({ message: 'mafamesh ' });
+        }
+
+        res.status(200).json(referees);
+    } catch (error) {
+        console.error('Error getting referees:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 
 module.exports = {
     add,
@@ -768,5 +786,6 @@ module.exports = {
     getRoleRequests,
     getUserRoleRequest,
     getPlayerTournaments,
-    getTeamsByTournament
+    getTeamsByTournament,
+    getAllReferees,
 }

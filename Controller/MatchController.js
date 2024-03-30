@@ -101,4 +101,16 @@ async function deleteMatch (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches}
+
+async function saveMatch (game){
+    
+    try{
+    const match= new Match(game)
+    await match.save();
+    
+    } catch (err){
+        console.log(err);
+    }
+}
+
+module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches,saveMatch}

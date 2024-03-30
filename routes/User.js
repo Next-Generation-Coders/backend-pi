@@ -44,7 +44,7 @@ router.get('/for-chat',tokenVerif.requireAuth,UserController.getUsersForChat)
 
 router.put('/avatar',tokenVerif.requireAuth,upload.single('avatar'),UserController.saveAvatar)
 
-
+router.get("/getAllReferees" ,UserController.getAllReferees );
 
 //CRUD
 router.post('/add',UserController.add);
