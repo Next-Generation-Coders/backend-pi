@@ -47,7 +47,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        docker.withRegistry("http://"+nexusRepoUrl, "docker-registry-credentials") {
+                        docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
                             sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:1.0"
                         }
                     } catch (Exception e) {
