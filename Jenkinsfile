@@ -66,14 +66,14 @@ pipeline {
         stage('Run Prometheus') {
             steps {
                 script {
-                    sh('docker run -d --name prometheus -p 9090:9090 prom/prometheus')
+                    sh('docker start prometheus')
                 }
             }
         }
         stage('Run Grafana') {
             steps {
                 script {
-                    sh('docker run -d --name grafana -p 5000:3000 grafana/grafana')
+                    sh('docker start grafana')
                 }
             }
         }
