@@ -47,9 +47,10 @@ pipeline {
             steps {
                 script {
                     try {
-                        docker.withRegistry("http://${registry}", registryCredentials) {
-                            sh "docker push ${registry}/backed-pipe_main_node_app:1.0"
+                        docker.withRegistry("http://"+registry, registryCredentials ) {
+                        sh('docker push $registry/b²acked-pipe_main_node_app:1.0')
                         }
+
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
                         echo e.getMessage()  // Print the error message
