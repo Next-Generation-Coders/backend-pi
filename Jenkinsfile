@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        dockerCredentials = credentials('docker')
+        dockerCredentials = credentials('docker-registry-credentials')
         nexusRepoUrl = "197.26.204.208:8082/repository/docker-repo/"
     }
     stages {
