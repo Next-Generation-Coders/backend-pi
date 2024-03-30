@@ -47,6 +47,7 @@ pipeline {
                 script {
                     try {
                         docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
+                            sh "docker tag backed-pipe_main_node_app:latest ${nexusRepoUrl}/${imageName}:${tag}"
                             sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
                         }
                     } catch (Exception e) {
