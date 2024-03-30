@@ -48,11 +48,11 @@ environment {
                 script {
                     try {
                         docker.withRegistry("http://${registry}", registryCredentials) {
-                            sh "docker push ${registry}/backend-pi:1.0"
+                            sh "docker push ${registry}/backed-pipe_main_node_app:1.0"
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
-                        echo e.getMessage()
+                        echo e
                         echo e.getStackTrace().join('\n')
                         // Mark the build as failed
                         error "Failed to push Docker image to Nexus"
