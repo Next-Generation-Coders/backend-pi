@@ -52,7 +52,7 @@ pipeline {
                             }catch(Exception e){
                                 echo "Error occurred during Docker push:"
                                 echo e.getMessage()
-                                echo e.getStackTrace().join('\n')
+                                echo e.getStackTrace()
                                 error "Failed to push Docker image to Nexus"
                             }
                             try{
@@ -60,14 +60,14 @@ pipeline {
                             }catch(Exception e){
                                 echo "Error occurred during Docker push:"
                                 echo e.getMessage()
-                                echo e.getStackTrace().join('\n')
+                                echo e.getStackTrace()
                                 error "Failed to push Docker image to Nexus"
                             }
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
                         echo e.getMessage()
-                        echo e.getStackTrace().join('\n')
+                        echo e.getStackTrace()
                         error "Failed to push Docker image to Nexus"
                     }
                 }
