@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         registryCredentials = "nexus"
-        registry = "http://197.26.204.208:8083/"
+        registry = "197.26.204.208:8083/"
     }
     stages {
         stage('Install dependencies') {
@@ -22,7 +22,7 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 script {
-                    docker.withRegistry(registry, registryCredentials) {
+                    docker.withRegistry("http://"+registry, registryCredentials) {
                         sh "docker tag backed-pipe_main_node_app:latest $registry/backed-pipe_main_node_app:latest"
                         sh('docker push $registry/backed-pipe_main_node_app:latest')
                     }
