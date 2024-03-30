@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-            dockerCredentials = credentials('docker-registry-credentials')
+            dockerUsername = "moataz024"
+            dockerPwd = "Bornin050301*"
             nexusCredentials = credentials('nexus')
             nexusRepoUrl = "http://197.26.204.208:8082/repository/docker-repo/"
         }
