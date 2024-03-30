@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         registryCredentials = "nexus"
-        registry = "172.18.0.1:8083"
+        registry = "127.0.0.1:8083"
     }
     stages {
         stage('Install dependencies') {
