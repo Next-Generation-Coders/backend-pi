@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        nexusRepoUrl = "localhost:8082/repository/docker-repo/"
+        nexusRepoUrl = "127.0.0.1:8082"
     }
     stages {
         stage('Install dependencies') {
@@ -47,7 +47,7 @@ pipeline {
                 script {
                     try {
                         docker.withRegistry("http://"+nexusRepoUrl, "nexus") {
-                            sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:1.0"
+                            sh "docker push ${nexusRepoUrl}/backed-pipe_main_node_app:latest"
                         }
                     } catch (Exception e) {
                         echo "Error occurred during Docker push:"
