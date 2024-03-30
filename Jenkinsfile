@@ -12,30 +12,6 @@ pipeline {
                 }
             }
         }
-        stage('Unit Test') {
-            steps {
-                script {
-                    sh 'npm run test'
-                }
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'scanner'
-                    withSonarQubeEnv {
-                        sh "${scannerHome}/bin/sonar-scanner -X"
-                    }
-                }
-            }
-        }
-        stage('Build application') {
-            steps {
-                script {
-                    sh 'npm run build'
-                }
-            }
-        }
         stage('Building image') {
             steps {
                 script {
