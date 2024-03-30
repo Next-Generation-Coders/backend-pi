@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        nexusRepoUrl = "197.26.204.208:8082/repository/docker-repo/"
+        nexusRepoUrl = "localhost:8082/repository/docker-repo/"
     }
     stages {
         stage('Install dependencies') {
