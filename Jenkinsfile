@@ -8,7 +8,6 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 script {
-                    sh 'rm -rf node_modules'
                     sh 'npm install --force'
                 }
             }
