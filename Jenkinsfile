@@ -32,8 +32,7 @@ pipeline {
 /*                     sh "${scannerHome}/bin/sonar-scanner clean verify sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
  */                    def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('SonarQube_Server') {
-                        sh "${scannerHome}/bin/sonar-scanner clean sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
-                    }
+                        sh "${scannerHome}/bin/sonar-scanner clean -Dsonar.projectKey=nodeappPi -Dsonar.projectName=nodeappPi -Dsonar.login=admin -Dsonar.password=123"                    }
                 }
             }
         }
