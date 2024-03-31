@@ -12,11 +12,6 @@ pipeline {
                 sh 'npm install --force'
             }
         }
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
         stage('Test') {
             steps {
                 sh 'npm test'
