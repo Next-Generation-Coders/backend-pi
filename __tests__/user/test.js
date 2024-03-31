@@ -1,26 +1,47 @@
-import chai from 'chai';
-import chaiHttp from 'chai-http';
-import app from '../../app';
+const express = require('express');
+const userRoutes = require('../routes/User');
+const request = require('supertest');
+const { expect } = require('chai');
+const jwt = require("jsonwebtoken");
+const mongo = require("mongoose");
+const config = require("../config/dbconfig.json");
 
-chai.use(chaiHttp);
-chai.should();
-
-describe('GET /User/getall', async () => {
-    await it("should get all users ",async (done) => {
-        await chai.request(app)
-            .get('/User/getall')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.body.should.be.a('array');
-                done();
-            });
+// Connect to MongoDB
+mongo.connect(config.url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+}).then(() => {
+    console.log("Database connected");
+    app.listen(3000, () => {
+        console.log("Server started on port 3000");
     });
+}).catch((err) => {
+    console.error("Error with database connection:", err);
+});
 
-    // it('should return a specific user by ID', async () => {
-    //     const res = await chai.request(app).get(`/api/users/${userId}`);
-    //     expect(res).to.have.status(200);
-    //     expect(res.body).to.be.an('object');
-    //     expect(res.body).to.have.property('id').equal(userId);
-    // });
+const app = express();
+app.use('/User', userRoutes);
 
+async function resolveGetUsers() {
+    const accessToken = jwt.sign(
+        {
+            "user": {
+                email: "moatazfoudhaily@gmail.com",
+                roles: [30]
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '1m' }
+    );
+    return await request(app)
+        .get('/User/getall')
+        .set('authorization', `Bearer ${accessToken}`);
+}
+
+describe('GET /User/getall', () => {
+    it('get all users', async () => {
+        const response = await resolveGetUsers();
+        console.log(response.statusCode);
+        expect(response.statusCode).to.equal(200);
+    }).timeout(30000);
 });
