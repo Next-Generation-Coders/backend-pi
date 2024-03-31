@@ -1,10 +1,10 @@
 const express = require('express');
-const userRoutes = require('../routes/User');
+const userRoutes = require('../../routes/User');
 const request = require('supertest');
 const { expect } = require('chai');
 const jwt = require("jsonwebtoken");
 const mongo = require("mongoose");
-const config = require("../config/dbconfig.json");
+const config = require("../../config/dbconfig.json");
 
 // Connect to MongoDB
 mongo.connect(config.url, {
