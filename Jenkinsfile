@@ -23,11 +23,15 @@ pipeline {
             }
         } */
         stage('SonarQube Analysis') {
-            def scannerHome = tool 'SonarQube_Server'
-            if (scannerHome == null) {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQube_Server'
+                    if (scannerHome == null) {
                         error "Default scannerHome tool not found"
                     }
                     sh "${scannerHome}/bin/sonar-scanner clean verify sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
+                }
+            }
         }
     }
 }
