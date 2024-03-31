@@ -9,7 +9,10 @@ const Notification = new Schema({
     notifDay : Number,
     notifMonth : Number,
     notifYear : Number,
-    receiver : User,
+    receiver : {
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'user'
+    }
 })
 
 module.exports = mongo.model('notification',Notification);

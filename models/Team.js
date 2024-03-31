@@ -24,6 +24,7 @@ const TeamSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    rating:Number,
 });
 
 module.exports = mongoose.model('Team', TeamSchema);

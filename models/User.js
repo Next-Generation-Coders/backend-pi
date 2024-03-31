@@ -25,6 +25,13 @@ const Role = {
     TEAM_MANAGER: 21
   };
 
+const RequestedRole = {
+    ACCEPTED:'ACCEPTED',
+    REJECTED:'REJECTED',
+    PENDING:'PENDING',
+    NEW:'NEW'
+};
+
 const User = new Schema({
     fullname : String,
     email : String,
@@ -40,6 +47,11 @@ const User = new Schema({
         enum : Object.values(Role),
         default : Role.USER
     }],
+    requestedRole: {
+        type : String,
+        enum : Object.values(RequestedRole),
+        default : RequestedRole.NEW
+    },
     isBlocked: {
         type:Boolean,
         default : false
@@ -59,7 +71,7 @@ const User = new Schema({
     rate:Number ,
     // for player
     position:String ,
-    jerseyNumber:Number ,
+    jersyNumber:Number ,
     //parseFloat to chnage it to float
     value:String,
     secret:String,
@@ -87,6 +99,10 @@ const User = new Schema({
             type:String,
             default:null
         },
+    },
+    addressWallet: {
+        type: String,
+        default: null
     }
 
 })
@@ -139,7 +155,7 @@ User.statics.signup = async function(email, password,phone,fullname,age) {
 
 User.statics.signupPlayer = async function(email, password,phone,fullname,age,position,jerseyNumber) {
 
-    if (!email || !password || !phone || !fullname || !age) {
+    if (!email || !password || !phone || !fullname || !age || !position || !jerseyNumber) {
         throw Error('All fields must be filled')
     }
     if (!validator.isEmail(email)) {

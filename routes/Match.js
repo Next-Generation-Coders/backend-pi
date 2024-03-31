@@ -1,9 +1,9 @@
 const express=require("express")
 const router=express.Router()
 const MatchController=require('../Controller/MatchController')
+const tokenVerif = require('../middlewares/tokenVerification')
 
-
-
+router.get('/ref-matches',tokenVerif.requireAuth,MatchController.getRefereeMatches);
 
 router.post('/add',MatchController.add);
 
