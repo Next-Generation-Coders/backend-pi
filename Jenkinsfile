@@ -30,9 +30,9 @@ pipeline {
                         error "Default scannerHome tool not found"
                     } */
 /*                     sh "${scannerHome}/bin/sonar-scanner clean verify sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
- */                    def scannerHome = tool 'SonarScanner'
+ */                    def scannerHome = tool 'SonarQube_Server'
                     withSonarQubeEnv('SonarQube_Server') {
-                        sh "${scannerHome}/bin/sonar-scanner clean verify sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
+                        sh "${scannerHome}/bin/sonar-scanner clean sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
                     }
                 }
             }
