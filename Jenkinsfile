@@ -30,9 +30,14 @@ pipeline {
                         error "Default scannerHome tool not found"
                     } */
 /*                     sh "${scannerHome}/bin/sonar-scanner clean verify sonar:sonar -Dsonar.projectKey=nodeappPi -Dsonar.projectName='nodeappPi' -Dsonar.login=admin -Dsonar.password=123"
- */                    def scannerHome = tool 'SonarScanner'
+ */                    def mvnHome = tool 'M2_HOME'
+                    
+                    // Check if the tool exists
+                    if (mvnHome == null) {
+                        error "Default Maven tool not found"
+                    }
                     withSonarQubeEnv('SonarQube_Server') {
-                        sh "${scannerHome}/bin/sonar-scanner clean -Dsonar.projectKey=nodeappPi -Dsonar.projectName=nodeappPi -Dsonar.login=admin -Dsonar.password=123"                    }
+                        sh "${mvnHome}/bin/sonar-scanner clean -Dsonar.projectKey=nodeappPi -Dsonar.projectName=nodeappPi -Dsonar.login=admin -Dsonar.password=123"                    }
                 }
             }
         }
