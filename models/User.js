@@ -78,7 +78,7 @@ const User = new Schema({
     googleId:String,
     avatar:{
         type:String,
-        default:"http://localhost:3000/placeholder.webp"
+        default:"http://197.26.204.208:3000/placeholder.webp"
     },
     country:{
         label:{

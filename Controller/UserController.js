@@ -392,7 +392,7 @@ async function saveAvatar(req, res) {
     try {
         const u = req.user
         console.log(req.file.filename);
-        u.avatar = "http://localhost:3000/uploads/avatar/"+req.file.filename;
+        u.avatar = "http://197.26.204.208:3000/uploads/avatar/"+req.file.filename;
         await User.findByIdAndUpdate(u._id, u);
         const user = await User.findById(u._id);
         const accessToken = jwt.sign(
