@@ -47,8 +47,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://"+registry, registryCredentials) {
-                        sh "docker tag backend-pipeline_moataz-node_app:latest $registry/backend-pipeline_moataz-node_app:latest"
-                        sh('docker push $registry/backend-pipeline_moataz-node_app:latest')
+                        sh "docker tag backend-pipeline_moataz_production-node_app:latest $registry/backend-pipeline_moataz_production-node_app:latest"
+                        sh('docker push $registry/backend-pipeline_moataz_production-node_app:latest')
                     }
                 }
             }
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://" + registry, registryCredentials) {
-                        sh('docker pull $registry/backend-pipeline_moataz-node_app:latest')
+                        sh('docker pull $registry/backend-pipeline_moataz_production-node_app:latest')
                         sh('docker-compose up -d')
                     }
                 }
