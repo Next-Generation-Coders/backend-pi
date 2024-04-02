@@ -16,7 +16,7 @@ pipeline {
                     steps {
                         script {
                             docker.withRegistry("http://"+registry, registryCredentials) {
-                                sh('docker push $registry/frontend-pipeline_gestion_utilisateur-node_app:latest')
+                                sh('docker push $registry/backed-pipe_moataz_production_node_app:latest')
                             }
                         }
                     }
@@ -25,7 +25,7 @@ pipeline {
                     steps {
                         script {
                             docker.withRegistry("http://" + registry, registryCredentials) {
-                                sh('docker pull $registry/frontend-pipeline_gestion_utilisateur-node_app:latest')
+                                sh('docker pull $registry/backed-pipe_moataz_production_node_app:latest')
                                 sh('docker-compose up -d')
                             }
                         }
