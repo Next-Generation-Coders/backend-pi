@@ -10,7 +10,7 @@ Router.get(
 Router.get(
     "/auth/google/callback",
     passport.authenticate("google", {
-        failureRedirect: "http://localhost:3001/login",
+        failureRedirect: "http://linkuptournament.tn:3001/login",
     }),
      function (req, res) {
         // Successful authentication, redirect home.
@@ -49,7 +49,7 @@ Router.get(
                 {expiresIn: '60m'}
             )
             res.redirect(
-                `http://localhost:3001?token=${token}`
+                `http://linkuptournament.tn:3001?token=${token}`
             )
 
         } catch (err) {
