@@ -110,7 +110,7 @@ max-width: 560px;\" class=\"container\">
 padding-top: 25px;
 color: #000000;
 font-family: sans-serif;\" class=\"header\">
-<img border=\"0\" vspace=\"0\" hspace=\"0\" src=\"http://localhost:3000/uploads/avatar/logo.png\" width=\"200\" height=\"58\" alt=\"Linkuptournament\" />
+<img border=\"0\" vspace=\"0\" hspace=\"0\" src=\"http://linkuptournament.tn:3000/uploads/avatar/logo.png\" width=\"200\" height=\"58\" alt=\"Linkuptournament\" />
 </td>
 </tr>
 <tr>
