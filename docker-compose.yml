@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: 197.26.204.208:8083/backend-pipeline_moataz_production-node_app:latest
     ports:
       - "3000:3000"
     volumes:
