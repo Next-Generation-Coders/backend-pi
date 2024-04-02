@@ -13,6 +13,7 @@ async function getRefereeMatches (req,res){
             const team2 = await Team.findById(match.team2);
             const tournament = await Tournament.findById(match.tournament);
             const matchDTO = {
+                _id:match._id,
                 team1,
                 team2,
                 tournament,
@@ -101,4 +102,16 @@ async function deleteMatch (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches}
+
+async function saveMatch (game){
+    
+    try{
+    const match= new Match(game)
+    await match.save();
+    
+    } catch (err){
+        console.log(err);
+    }
+}
+
+module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches,saveMatch}

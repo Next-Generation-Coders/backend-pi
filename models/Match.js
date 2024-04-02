@@ -3,12 +3,10 @@ const matchSchema = new mongoose.Schema({
     team1: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team',
-        required: true
     },
     team2: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team',
-        required: true
     },
     date: {
         type: Date,
@@ -19,6 +17,8 @@ const matchSchema = new mongoose.Schema({
     endDay : Number,
     endMonth : Number,
     endYear : Number,
+    startHour: Number , 
+    startMinutes: Number ,
     result : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MatchResult'
@@ -31,7 +31,11 @@ const matchSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         default:null
-    }
+    },
+    stadium :{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Stadium'
+    },
 });
 
 const Match = mongoose.model('Match', matchSchema);

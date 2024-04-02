@@ -3,6 +3,7 @@ const mongo = require('mongoose');
 const Schema = mongo.Schema
 
 const Stadium = new Schema({
+    name : String ,
     location : String,
     startResDay : Number,
     startResMonth : Number,
