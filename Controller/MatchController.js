@@ -13,6 +13,7 @@ async function getRefereeMatches (req,res){
             const team2 = await Team.findById(match.team2);
             const tournament = await Tournament.findById(match.tournament);
             const matchDTO = {
+                _id:match._id,
                 team1,
                 team2,
                 tournament,

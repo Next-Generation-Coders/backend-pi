@@ -110,7 +110,7 @@ const MatchRouter = require("./routes/Match");
 app.use("/Match", MatchRouter);
 
 // Server setup
-app.use("/api",ResultRouter);
+app.use("/result",ResultRouter);
 const server=http.createServer(app);
 const io=require("socket.io")(server);
 chatSocket=io;
