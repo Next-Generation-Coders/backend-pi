@@ -77,6 +77,34 @@ router.get('/result/:matchId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
+router.get('/resultsMatches', async (req, res) => {
+
+  try {
+    // Find the result by match ID
+    const result = await Result.find().populate({ 
+      path: 'match',
+      populate: [
+        { path: 'team1', model: 'Team' },
+        { path: 'team2', model: 'Team' }
+      ]
+      
+
+   })
+
+    if (!result) {
+      return res.status(404).json({ message: 'Result not found for the given match ID' });
+    }
+
+    // Send the result as JSON response
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching result:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 // Route to get the two teams playing in the match by match ID
 router.get('/teams/:matchId', async (req, res) => {
   const { matchId } = req.params;
