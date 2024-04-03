@@ -1,5 +1,31 @@
 //je change le nom de l'entité ici et partout
 const Match = require('../models/Match')
+const Team = require('../models/Team')
+const Tournament = require('../models/Tournament')
+async function getRefereeMatches (req,res){
+    try{
+        const user = req.user;
+        const data = await Match.find();
+        const myMatches = data.filter(match=>(match._ref && match._ref.equals(user._id)));
+        let matchesDTO = [];
+        for (const match of myMatches) {
+            const team1 = await Team.findById(match.team1);
+            const team2 = await Team.findById(match.team2);
+            const tournament = await Tournament.findById(match.tournament);
+            const matchDTO = {
+                team1,
+                team2,
+                tournament,
+                date : match.date
+            }
+            matchesDTO.push(matchDTO);
+        }
+        res.status(200).send(matchesDTO)
+    }catch(err){
+        res.status(400).json({error:err.message});
+    }
+}
+
 
 async function add (req,res){
     console.log(req.body)
@@ -19,10 +45,7 @@ async function getall (req,res){
 
     }catch(err){
         res.status(400).json({error:err});
-
-
     }
-
 }
 
 async function getbyid (req,res){
@@ -33,8 +56,6 @@ async function getbyid (req,res){
 
     }catch(err){
         res.status(400).json({error:err});
-
-
     }
 
 }
@@ -82,4 +103,4 @@ async function deleteMatch (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteMatch}
+module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches}

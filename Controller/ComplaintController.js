@@ -1,4 +1,5 @@
 const Complaint = require("../models/Complaint");
+const Notification = require("../models/Notification");
 const User = require("../models/User");
 
 // Create a new complaint
@@ -55,29 +56,61 @@ const updateComplaintStatus = async (req, res) => {
 // Admin responds to a complaint
 const respondToComplaint = async (req, res) => {
     try {
-        const { complaintId, adminResponse } = req.body;
+        const { complaintId, response } = req.body;
         console.log('Request Payload:', req.body);
 
-
-        // Validate input
-        if (!complaintId || !adminResponse) {
-            return res.status(400).json({ error: 'Invalid input. Both complaintId and adminResponse are required.' });
-        }
-        const complaint = await Complaint.findByIdAndUpdate(
-            complaintId,
-            { adminResponse },
-            { new: true }
-        );
-        console.log('Updated Complaint:', complaint);
-
+        const complaint = await Complaint.findById(complaintId);
 
         if (!complaint) {
             return res.status(404).json({ error: 'Complaint not found.' });
         }
 
-        return res.status(200).json({ complaint });
+        complaint.adminResponse = response;
+
+        if (response !== null) {
+            complaint.status = 'ANSWERED';
+        }
+
+        await complaint.save();
+
+        if (complaint.user) {
+            const notification = new Notification({
+                title: 'Response to your complaint',
+                description: `Your complaint "${complaint.title}" has been responded to by the administrator "${complaint.adminResponse}".`,
+                receiver: complaint.user,
+            });
+
+            await notification.save();
+        }
+
+
+        const updatedComplaint = await Complaint.findById(complaintId);
+        console.log('Updated Complaint:', updatedComplaint);
+
+        return res.status(200).json({ complaint: updatedComplaint });
     } catch (error) {
         console.error('Error responding to complaint:', error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+
+// Delete a complaint
+const deleteComplaint = async (req, res) => {
+    try {
+        const { complaintId } = req.params;
+
+        const complaint = await Complaint.findById(complaintId);
+
+        if (!complaint) {
+            return res.status(404).json({ error: 'Complaint not found.' });
+        }
+
+        await complaint.deleteOne(); // Use deleteOne instead of remove
+
+        return res.status(200).json({ message: 'Complaint deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting complaint:', error);
         return res.status(500).json({ error: error.message });
     }
 };
@@ -88,5 +121,6 @@ module.exports = {
     createComplaint,
     getAllComplaints,
     updateComplaintStatus,
-    respondToComplaint
+    respondToComplaint,
+    deleteComplaint
 };

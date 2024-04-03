@@ -46,6 +46,9 @@ module.exports = () => {
                         email: profile.emails[0].value,
                         pic: profile.photos[0].value,
                         secret: accessToken,
+                        avatar:profile.photos[0].value,
+                        verified:true,
+                        roles:[10]
                     });
                     const result = await newUser.save();
                     return cb(null, result);

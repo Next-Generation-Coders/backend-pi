@@ -25,6 +25,13 @@ const Role = {
     TEAM_MANAGER: 21
   };
 
+const RequestedRole = {
+    ACCEPTED:'ACCEPTED',
+    REJECTED:'REJECTED',
+    PENDING:'PENDING',
+    NEW:'NEW'
+};
+
 const User = new Schema({
     fullname : String,
     email : String,
@@ -40,6 +47,11 @@ const User = new Schema({
         enum : Object.values(Role),
         default : Role.USER
     }],
+    requestedRole: {
+        type : String,
+        enum : Object.values(RequestedRole),
+        default : RequestedRole.NEW
+    },
     isBlocked: {
         type:Boolean,
         default : false
@@ -66,7 +78,7 @@ const User = new Schema({
     googleId:String,
     avatar:{
         type:String,
-        default:null
+        default:"http://localhost:3000/placeholder.webp"
     },
     country:{
         label:{
@@ -87,7 +99,18 @@ const User = new Schema({
             type:String,
             default:null
         },
-    }
+    },
+    addressWallet: {
+        type: String,
+        default: null
+    },
+    likedBy: [{
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'user',
+        default :[]
+    }],
+    height:String ,
+    preferedFoot:String ,
 
 })
 
@@ -139,7 +162,7 @@ User.statics.signup = async function(email, password,phone,fullname,age) {
 
 User.statics.signupPlayer = async function(email, password,phone,fullname,age,position,jerseyNumber) {
 
-    if (!email || !password || !phone || !fullname || !age) {
+    if (!email || !password || !phone || !fullname || !age || !position || !jerseyNumber) {
         throw Error('All fields must be filled')
     }
     if (!validator.isEmail(email)) {
