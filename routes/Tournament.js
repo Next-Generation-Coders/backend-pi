@@ -49,7 +49,7 @@ router.put("/UpdateTournamentKnockout/:id/:matchId" ,TournamentControlle.Knockou
 
 router.put("/generateKnockoutChampionshipMatches/:id" , TournamentControlle.generateKnockoutChampionshipMatches)
 
-router.put("/UpdateGroupStandingAfterMatch/:id" , TournamentControlle.UpdateGroupStandingAfterMatch );
+router.put("/UpdateGroupStandingAfterMatch/:matchID" , TournamentControlle.UpdateGroupStandingAfterMatch );
 
 router.put("/addRefereesAndStadiumsToTournament/:id", TournamentControlle.addRefereesAndStadiumsToTournament)
 
@@ -64,6 +64,10 @@ router.get("/GetGroupsAndStandings/:id" , TournamentControlle.GetGroupsAndStandi
 router.get("/FixturesByDayKnockout/:id/:day",  TournamentControlle.FixturesByDayKnockout) ;
 
 router.get("/MatcheGroupsByday/:id/:day", TournamentControlle.getMatchesFromGroupsWithMatchesByday);
+
+router.get("/getTournamentBymatch/:matchID", TournamentControlle.getTournamentbyMatch);
+
+router.get("/getTeamsOftournament/:id" , TournamentControlle.getTeamsOftournament);
 
 
 module.exports = router;

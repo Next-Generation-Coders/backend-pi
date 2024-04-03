@@ -16,17 +16,19 @@ const StadiumModel = require('../models/Stadium.js')
 async function add(req, res) {
     
     const user = req.user;
+    const Data = req.body;
+    console.log(Data)
     try {
-        const tournamentData = { ...req.body, user: user.id };
+        const tournamentData = { Data, user: user.id };
 
-
+        if (req.body.logo) {
         const base64Image = req.body.logo.split(';base64,').pop();
         const filename = 'tournament_' + Date.now() + '.png'; 
         const filePath = path.join(__dirname, '..', 'uploads', 'tournament', filename); 
         fs.writeFileSync(filePath, base64Image, { encoding: 'base64' });
 
         tournamentData.logo = 'http://localhost:3000/uploads/tournament/' + filename;
-
+        }
         const tournament = new Tournament(tournamentData);
         await tournament.save();
         res.status(201).json({ tournamentId: tournament._id });
@@ -950,18 +952,21 @@ const determineGroupWinners = async (standingsId) => {
 
 async function UpdateGroupStandingAfterMatch(req, res) {
     try {
-        const resultId = req.params.id;
-
-        const result = await Result.findById(resultId);
-        if (!result) {
-            return res.status(404).json({ error: 'Result not found' });
-        }
-
-        const matchId = result.match;
+        const matchId = req.params.matchID;
+        
         const match = await Match.findById(matchId);
         if (!match) {
             return res.status(404).json({ error: 'Match not found' });
         }
+        
+        const result = await ResultController.getResultByMatch(matchId);
+        if (!result) {
+            return res.status(404).json({ error: 'Result not found' });
+        }
+
+        
+        
+        
 
         const tournamentId = match.tournament;
         const tournament = await Tournament.findById(tournamentId)
@@ -970,7 +975,7 @@ async function UpdateGroupStandingAfterMatch(req, res) {
         };
 
         const groupsWithMatches = tournament.groupsWithMatches;
-
+console.log(groupsWithMatches);
         let groupBelongedTo = null;
         for (const group of groupsWithMatches) {
             const matchesInGroup = group.matches.map(match => match.toString());
@@ -1228,6 +1233,56 @@ async function FixturesByDayKnockout  (req, res)  {
 
 
 
+    const getTournamentbyMatch = async(req,res) =>{
+        
+        try{
+        const matchId = req.params.matchID;
+        const match = await Match.findById(matchId);
+        const tournamentId = match.tournament ; 
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+        res.status(200).send(tournament)
+    }catch(error){
+        console.error('Error fetching matches from groupsWithMatches:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+        
+    };
+
+
+    const getTeamsOftournament = async (req,res) =>{
+       
+       try {
+       
+        const tournamentId = req.params.id; 
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
+    
+        const teams = tournament.teams;
+    data =[];
+    for (const team of teams){
+        const TeamItem = await Team.findById(team);
+        if (team) {       
+            data.push(TeamItem);
+        }
+    }
+
+    res.status(200).send(data)
+    }
+    
+    catch(error){
+        console.error('Error fetching teams from tournament:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+    
+    }
+
+
 module.exports={
     add,
     getall,
@@ -1258,5 +1313,7 @@ module.exports={
     getMatchesFromGroupsWithMatches,
     GetGroupsAndStandings,
     FixturesByDayKnockout,
-    getMatchesFromGroupsWithMatchesByday
+    getMatchesFromGroupsWithMatchesByday,
+    getTournamentbyMatch,
+    getTeamsOftournament
 }

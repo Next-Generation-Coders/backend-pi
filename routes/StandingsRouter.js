@@ -10,6 +10,6 @@ router.get("/GetByTournament/:id" , Standingscontroller.getStandingsByTournament
 
 router.get("/GetbyID/:id", Standingscontroller.getStandingsById)
 
-router.put("/upadteStandings/:id/:matchId" , Standingscontroller.updateStanding); 
+router.put("/upadteStandings/:matchId" , Standingscontroller.updateStanding); 
 
 module.exports = router;

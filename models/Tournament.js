@@ -112,6 +112,10 @@ const TournamentSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Stadium'
     }],
+    GPended:{
+        type:Boolean,
+        default:false
+    },
 });
 
 module.exports = mongoose.model('Tournament', TournamentSchema);

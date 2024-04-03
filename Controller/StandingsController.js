@@ -81,8 +81,10 @@ const getStandingsById = async (req, res) => {
 
   const updateStanding = async (req, res) => {
     try {
-        const tournamentId = req.params.id;
+       
         const matchId = req.params.matchId;
+        const match = await Match.findById(matchId);
+        const tournamentId = match.tournament ; 
         const tournament = await Tournament.findById(tournamentId).populate('teams').exec();
         const result = await ResultController.getResultByMatch(matchId);
         const winner = await ResultController.getMatchWinner(matchId);
@@ -91,7 +93,7 @@ const getStandingsById = async (req, res) => {
             return res.status(404).json({ error: 'Invalid tournament or match result' });
         }
 
-        const match = await Match.findById(matchId);
+        
         const team1 = match.team1;
         const team2 = match.team2;
 
