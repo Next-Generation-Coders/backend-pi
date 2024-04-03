@@ -37,7 +37,11 @@ const LineupSchema = new Schema({
           position: {
             type: String,
             required: true
-          }
+          },
+          avatar:{
+            type:String,
+            default:"http://localhost:3000/placeholder.webp"
+        },
         }
       ]
 });

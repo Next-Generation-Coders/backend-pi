@@ -755,6 +755,71 @@ async function getAllReferees (req, res) {
 
 
 
+
+async function likedBy(req, res) {
+    try {
+        const player = await User.findById(req.params.id);
+
+        if (!player) {
+            return res.status(404).json({ error: 'Player not found' });
+        }
+
+        // Initialize likedBy array if it's not present
+        if (!player.likedBy) {
+            player.likedBy = [];
+        }
+        const userId = req.body.userId;
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+
+        const isLiked =player.likedBy.includes(userId);
+
+        
+            //console.log(isLiked)
+        // Toggle like status
+        if (isLiked) {
+            // Remove the user ID from the likedBy array
+            const index = player.likedBy.indexOf(userId);
+            if (index > -1) {
+                player.likedBy.splice(index, 1);
+            }
+        } else {
+            // Add the user ID to the likedBy array
+/*             console.log(player+"\n +++"+userId+"\n +++"+player.likedBy)
+ */            player.likedBy.push(userId);
+        }
+
+        // Save the updated player data
+        await player.save();
+
+        res.status(200).json({ message: 'Like status updated successfully', player });
+    } catch (err) {
+        console.error('Error updating like status:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+async function checkLiked(req, res) {
+    try {
+        const player = await User.findById(req.params.id);
+        const userId = req.params.userId;
+
+        const isLiked =player.likedBy.includes(userId);
+        
+        const qty=player.likedBy.length ;
+        //console.log(isLiked,qty)
+        
+        res.status(200).json({isLiked,qty});
+        
+    } catch (err) {
+        res.status(400).json({error: err});
+    }
+}
+
+
+
 module.exports = {
     add,
     getall,
@@ -787,5 +852,7 @@ module.exports = {
     getUserRoleRequest,
     getPlayerTournaments,
     getTeamsByTournament,
+    likedBy,
+    checkLiked,
     getAllReferees,
 }

@@ -103,7 +103,14 @@ const User = new Schema({
     addressWallet: {
         type: String,
         default: null
-    }
+    },
+    likedBy: [{
+        type: mongo.Schema.Types.ObjectId,
+        ref: 'user',
+        default :[]
+    }],
+    height:String ,
+    preferedFoot:String ,
 
 })
 

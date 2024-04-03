@@ -129,14 +129,23 @@ async function addPlayerToTeam(req, res) {
                 const player = new User(req.body);
                 //console.log(player)
                 player.roles=[10,11] 
+                /* -------------------------------
+                
                 player.currentTeam=coach.currentTeam
-                player.teams.push(coach.currentTeam)
+                player.teams.push(coach.currentTeam) 
+                
+                */
                 //console.log(player+"\n"+player.roles)
                 await player.save();
                 //existingPlayer = player;
+                /* 
+                
                 const team = await Team.findOne({ team_manager: coach._id });
                 team.players.push(player._id);
-                await team.save();
+                await team.save(); 
+                
+                -------------------------------
+                */
             }
 
             // Find the team associated with the coach

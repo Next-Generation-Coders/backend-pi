@@ -69,4 +69,8 @@ router.get('/getallPlayersWithNoTeam',UserController.getallPlayersWithNoTeam);
 
 router.get('/getallCoachesWithNoTeam',UserController.getallCoachesWithNoTeam);
 
+router.put('/likedBy/:id',UserController.likedBy);
+
+router.get('/checkLiked/:id/:userId',UserController.checkLiked);
+
 module.exports = router;
