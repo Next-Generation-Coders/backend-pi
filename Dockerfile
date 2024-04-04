@@ -10,6 +10,7 @@ COPY Controller ./Controller
 COPY routes ./routes
 COPY models ./models
 COPY middlewares ./middlewares
+COPY uploads ./uploads
 RUN npm i nodemon --force
 RUN npm install
 EXPOSE 3000
