@@ -42,7 +42,8 @@ async function resolveGetTournaments() {
 
 describe('GET /Tournament/getall', () => {
   it('get all tournaments', async () => {
-    const response = await resolveGetTournaments();
+    const response = await request(app)
+      .get('/Tournament/getall');
     console.log(response.statusCode);
     expect(response.statusCode).to.equal(200);
   }).timeout(30000);
