@@ -17,7 +17,7 @@ pipeline {
                            stage('Unit Test for tournament controllers') {
                     steps {
                         script {
-                            sh 'npm run testTournament'
+                            sh 'npm run testAdem'
                         }
                     }
                 }
