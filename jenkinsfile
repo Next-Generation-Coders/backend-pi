@@ -1,8 +1,9 @@
 pipeline {
     agent any
     environment {
-        registryCredentials = "nexus"
-        registry = "172.17.0.2:8083"
+        
+         registryCredentials = "nexus"
+        registry = "192.168.33.10:8083"
     }
     stages {
         stage('Install dependencies') {
@@ -12,14 +13,15 @@ pipeline {
                 }
             }
         }
-        	stage('Unit Test') {
+        
+                           stage('Unit Test for tournament controllers') {
                     steps {
                         script {
-                            sh 'npm run test'
+                            sh 'npm run testTournament'
                         }
                     }
                 }
-                stage('SonarQube Analysis') {
+                               stage('SonarQube Analysis') {
                     steps {
                         script {
                             def scannerHome = tool 'scanner'
@@ -29,41 +31,46 @@ pipeline {
                         }
                     }
                 }
-                stage('Build application') {
-                    steps {
-                        script {
-                            sh 'npm run build'
-                        }
+
+                       
+                    stage('Build application') {
+                        steps {
+                            script {
+                                sh 'npm run build'
+                                    }
+                                }
                     }
-                }
-                stage('Building image') {
+                    stage('Building DockerImage') {
                     steps {
                         script {
                             sh('docker-compose build')
                         }
                     }
                 }
-        stage('Deploy to Nexus') {
+
+ stage('Deploy to Nexus') {
             steps {
                 script {
                     docker.withRegistry("http://"+registry, registryCredentials) {
-                        sh "docker tag backed-pipe_main_node_app:latest $registry/backed-pipe_main_node_app:latest"
-                        sh('docker push $registry/backed-pipe_main_node_app:latest')
+                        sh "docker tag devops_pipeline_for_backend_adem_node_app:latest $registry/devops_pipeline_for_backend_adem_node_app:latest"
+                        sh "docker push $registry/devops_pipeline_for_backend_adem_node_app:latest"
+
                     }
                 }
             }
         }
-        stage('Run application') {
+stage('Run application') {
             steps {
                 script {
                     docker.withRegistry("http://" + registry, registryCredentials) {
-                        sh('docker pull $registry/backed-pipe_main_node_app:latest')
+                        sh('docker pull $registry/devops_pipeline_for_backend_adem_node_app:latest')
                         sh('docker-compose up -d')
                     }
                 }
             }
         }
-        stage('Run Prometheus') {
+
+ stage('Run Prometheus') {
             steps {
                 script {
                     sh('docker start prometheus')
@@ -77,6 +84,7 @@ pipeline {
                 }
             }
         }
-
+           
+      
     }
 }
