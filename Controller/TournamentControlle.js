@@ -17,9 +17,8 @@ async function add(req, res) {
     
     const user = req.user;
     const Data = req.body;
-    console.log(Data)
     try {
-        const tournamentData = { Data, user: user.id };
+        const tournamentData = { ...req.body, user: user.id };
 
         if (req.body.logo) {
         const base64Image = req.body.logo.split(';base64,').pop();
