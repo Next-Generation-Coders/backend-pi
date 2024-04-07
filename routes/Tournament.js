@@ -27,6 +27,8 @@ router.get("/fixtures/:id",TournamentControlle.getFixtures);
 
 router.get("/fixturesByDay/:id/:day",TournamentControlle.getfixturesbyDay);
 
+router.get('/getByUserId/:userId', TournamentControlle.getTournamentsByUserId);
+
 router.get("/DoubleLegLeagueMatchGeneration/:id", TournamentControlle.generateDoubleLegSchedule)
 
 router.get("/UserTournaments",tokenVerif.requireAuth , TournamentControlle.getTournamentsByUserId)

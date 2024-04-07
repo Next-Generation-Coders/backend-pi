@@ -14,20 +14,19 @@ const Result = require('../models/Result.js');
 const StadiumModel = require('../models/Stadium.js')
 
 async function add(req, res) {
-    
+
     const user = req.user;
     const Data = req.body;
-    console.log(Data)
     try {
-        const tournamentData = { Data, user: user.id };
+        const tournamentData = { ...req.body, user: user.id };
 
         if (req.body.logo) {
-        const base64Image = req.body.logo.split(';base64,').pop();
-        const filename = 'tournament_' + Date.now() + '.png'; 
-        const filePath = path.join(__dirname, '..', 'uploads', 'tournament', filename); 
-        fs.writeFileSync(filePath, base64Image, { encoding: 'base64' });
+            const base64Image = req.body.logo.split(';base64,').pop();
+            const filename = 'tournament_' + Date.now() + '.png';
+            const filePath = path.join(__dirname, '..', 'uploads', 'tournament', filename);
+            fs.writeFileSync(filePath, base64Image, { encoding: 'base64' });
 
-        tournamentData.logo = 'http://localhost:3000/uploads/tournament/' + filename;
+            tournamentData.logo = 'http://localhost:3000/uploads/tournament/' + filename;
         }
         const tournament = new Tournament(tournamentData);
         await tournament.save();
@@ -169,7 +168,7 @@ async function generateDoubleLegSchedule(req, res) {
         const halfNumTeams = numTeams / 2;
         const schedule = [];
 
-        for (let leg = 1; leg <= 2; leg++) { 
+        for (let leg = 1; leg <= 2; leg++) {
             for (let round = 1; round <= numRounds; round++) {
                 const roundSchedule = [];
                 for (let i = 0; i < halfNumTeams; i++) {
@@ -177,7 +176,7 @@ async function generateDoubleLegSchedule(req, res) {
                     if (leg === 1) {
                         team1 = teams[i];
                         team2 = teams[numTeams - 1 - i];
-                    } else { 
+                    } else {
                         team1 = teams[numTeams - 1 - i];
                         team2 = teams[i];
                     }
@@ -193,12 +192,12 @@ async function generateDoubleLegSchedule(req, res) {
                 }
                 schedule.push(roundSchedule);
 
-                
+
                 teams.splice(1, 0, teams.pop());
             }
         }
 
-    
+
         await Tournament.findByIdAndUpdate(
             req.params.id,
             { matches: schedule },
@@ -215,7 +214,7 @@ async function generateDoubleLegSchedule(req, res) {
 
 async function addTeams(req, res) {
     try {
-        
+
         const tournamentId = req.params.id;
         const teamsToAdd = req.body.teams;
 
@@ -228,7 +227,7 @@ async function addTeams(req, res) {
 
         tournament.teams.push(...teamsToAdd);
 
-      
+
         const updatedTournament = await tournament.save();
 
         res.status(200).json({ message: "Teams added to tournament successfully", tournament: updatedTournament });
@@ -244,7 +243,7 @@ async function generateLeagueMatchFixtures (req,res)  {
 
 
         if ( 'League'===tournament.TournamentType ) {
-          
+
             const teams = tournament.teams;
 
 
@@ -276,7 +275,7 @@ async function getFixtures(req, res) {
     const tournamentId = req.params.id;
 
     try {
-    
+
         const tournament = await Tournament.findById(tournamentId).populate('matches');
 
         if (!tournament) {
@@ -284,7 +283,7 @@ async function getFixtures(req, res) {
         }
 
         const fixtures = tournament.matches;
-console.log(fixtures)
+        console.log(fixtures)
         res.status(200).json({ fixtures });
     } catch (error) {
         console.error('Error fetching fixtures:', error);
@@ -330,25 +329,10 @@ function shuffleArray(array) {
     }
 }
 
-async function getTournamentsByUserId(req, res) {
-    const userId = req.user.id;
-    
-
-    try {
-
-        const tournaments = await Tournament.find({ user: userId });
-
-        res.status(200).json({ tournaments });
-    } catch (error) {
-        console.error('Error fetching tournaments by user ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-}
-
 const startTournament = async (req, res) => {
     const  tournamentId  = req.params.id;
     try {
-  
+
         const tournament = await Tournament.findById(tournamentId);
 
         if (!tournament) {
@@ -391,12 +375,12 @@ const KnockoutTournamentBuild = async (req, res) => {
 
         const numMatches = teams.length / 2;
         for (let i = 0; i < numMatches; i++) {
-             const match = new Match({
+            const match = new Match({
                 team1: teams [i * 2],
                 team2:  teams[i * 2 + 1],
                 tournament: tournamentId
-             });
-             await match.save();
+            });
+            await match.save();
             fixtures.push(match);
         }
 
@@ -412,7 +396,7 @@ const KnockoutTournamentBuild = async (req, res) => {
         for (let i = 2; i <= numRounds; i++) {
             const numMatches = teams.length / Math.pow(2, i);
             const fixtures = [];
-        
+
             for (let j = 0; j < numMatches; j++) {
                 const match = new Match({
                     tournament: tournamentId,
@@ -421,20 +405,20 @@ const KnockoutTournamentBuild = async (req, res) => {
                 });
                 await MatchController.saveMatch(match);
                 console.log("m atch ",match);
-                  fixtures.push(match);
-                  console.log("this the match id " , match._id);
-                  console.log("fixtures saved ",fixtures)
-               
+                fixtures.push(match);
+                console.log("this the match id " , match._id);
+                console.log("fixtures saved ",fixtures)
+
             }
-        
-            const round = { 
-                title: `Round ${i}`, 
+
+            const round = {
+                title: `Round ${i}`,
                 fixtures: fixtures
             };
-        console.log("round 2 " , round)
+            console.log("round 2 " , round)
             rounds.push(round);
         }
-        
+
 
         await Tournament.findByIdAndUpdate(
             req.params.id,
@@ -454,7 +438,7 @@ const getTournamentRoundsById = async (req, res) => {
         // Fetch tournament details from the database
         const tournamentId = req.params.id;
         const tournament = await Tournament.findById(tournamentId);
-        
+
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
         }
@@ -472,7 +456,7 @@ const getTournamentRoundsById = async (req, res) => {
 
 const generateInitialRoundFixtures = (teams) => {
     shuffleArray(teams);
-    
+
     const fixtures = [];
 
     const numMatches = teams.length / 2;
@@ -488,16 +472,16 @@ const generateInitialRoundFixtures = (teams) => {
 
 const generateKnockoutFixtures = (teams) => {
     shuffleArray(teams);
-    
+
     const fixtures = [];
 
     const numMatches = teams.length / 2;
 
     for (let i = 0; i < numMatches; i++) {
-         const match = new Match({
+        const match = new Match({
             team1: teams [i*2],
             team2:  teams[i * 2 + 1]
-         });
+        });
 
         fixtures.push({ homeTeam: teams[i * 2], awayTeam: teams[i * 2 + 1] });
     }
@@ -511,14 +495,14 @@ const generateKnockoutFixtures = (teams) => {
 
     return fixtures;
 
-   
+
 };
 
 
 
 async function createChampionshipGroupsAndMatches(req, res) {
     try {
-        
+
         const tournamentId = req.params.id;
         const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
@@ -537,14 +521,14 @@ async function createChampionshipGroupsAndMatches(req, res) {
             const numGroups = Math.ceil(numTeams / 4);
             const teamsPerGroup = Math.floor(numTeams / numGroups);
 
-         
+
             const groups = [];
             for (let i = 0; i < numGroups; i++) {
                 const groupTeams = teams.slice(i * teamsPerGroup, (i + 1) * teamsPerGroup);
                 groups.push(groupTeams);
             }
 
-            
+
             const matchesPromises = groups.map(group => {
                 return generateRoundRobinGroupPhaseMatches(group, tournamentId);
             });
@@ -555,10 +539,10 @@ async function createChampionshipGroupsAndMatches(req, res) {
                 const GroupStandingId = await createInitialStandingsForGroups(group, tournamentId);
                 return GroupStandingId;
             });
-            
+
             const groupsWithStandings = await Promise.all(groupsWithStandingsPromises);
 
-            
+
             const groupsWithMatches = groups.map((group, index) => {
                 return {
                     teams: group,
@@ -569,7 +553,7 @@ async function createChampionshipGroupsAndMatches(req, res) {
 
             console.log({ groupsWithMatches });
 
-            
+
             await Tournament.findByIdAndUpdate(
                 tournamentId,
                 { groupsWithMatches: groupsWithMatches },
@@ -584,7 +568,7 @@ async function createChampionshipGroupsAndMatches(req, res) {
 
 const createInitialStandingsForGroups = async (group, tournamentId) => {
     try {
-        
+
 
         const initialStandings = group.map((team) => ({
             team: team._id,
@@ -609,7 +593,7 @@ const createInitialStandingsForGroups = async (group, tournamentId) => {
         return standingsForGroup;
     } catch (error) {
         console.error('Error creating initial standings:', error);
-        throw error; 
+        throw error;
     }
 };
 
@@ -634,16 +618,16 @@ const generateRoundRobinGroupPhaseMatches = async (teams, tournamentId) => {
                 tournament: tournamentId
             });
             await match.save();
-            matchIds.push(match._id); 
+            matchIds.push(match._id);
             roundSchedule.push(match);
 
         }
         schedule.push(roundSchedule);
 
-      
+
         teams.splice(1, 0, teams.pop());
     }
-    return matchIds; 
+    return matchIds;
 };
 
 
@@ -658,17 +642,17 @@ async function addRateToTournament(req, res) {
         if (rate < 1 || rate > 5) {
             return res.status(400).json({ error: 'Invalid rate. Rate must be between 1 and 5' });
         }
-        
+
         const key = rate === 1 ? '1 star' : `${rate} stars`;
         const ratingTable = tournament.rating ;
-        ratingTable[key] = ratingTable[key] + 1 ; 
+        ratingTable[key] = ratingTable[key] + 1 ;
         await Tournament.findByIdAndUpdate(
             tournamentId,
             { rating: ratingTable },
             { new: true }
         );
 
-        
+
         res.status(200).json({ message: 'Rate added successfully' });
     } catch (error) {
         console.error('Error adding rate to tournament:', error);
@@ -679,35 +663,35 @@ async function addRateToTournament(req, res) {
 
 
 async function FollowTournament(req,res) {
-    
 
-try {
-    const tournamentId = req.params.id; 
-    const user = req.user;
-    const tournament = await Tournament.findById(tournamentId);
+
+    try {
+        const tournamentId = req.params.id;
+        const user = req.user;
+        const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
         }
-const organizer = await User.findById(tournament.user)
-    const newFollowers = tournament.followers ; 
-    newFollowers.push(user._id) ; 
-    await Tournament.findByIdAndUpdate(
-        tournamentId,
-        { followers: newFollowers },
-        { new: true }
-    );
-    await mailer.sendMail({
-        from: "rejebadem99@gmail.com" ,
-        to: user.email , 
-        subject: "follow",
-        
-        
-    });
-    res.status(200).json({ message: 'follower added successfully' });
-} catch (error) {
-    console.error('Error adding follower to tournament:', error);
+        const organizer = await User.findById(tournament.user)
+        const newFollowers = tournament.followers ;
+        newFollowers.push(user._id) ;
+        await Tournament.findByIdAndUpdate(
+            tournamentId,
+            { followers: newFollowers },
+            { new: true }
+        );
+        await mailer.sendMail({
+            from: "rejebadem99@gmail.com" ,
+            to: user.email ,
+            subject: "follow",
+
+
+        });
+        res.status(200).json({ message: 'follower added successfully' });
+    } catch (error) {
+        console.error('Error adding follower to tournament:', error);
         res.status(500).json({ error: 'Internal server error' });
-}
+    }
 
 
 
@@ -761,8 +745,8 @@ async function KnockoutUpdateTournamentRounds(req, res) {
         let roundIndex = -1;
         let matchIndex = -1;
         let matchFound = false;
-        
-  
+
+
         tournament.rounds.forEach((round, rIndex) => {
             round.fixtures.forEach((fixture, mIndex) => {
                 if (fixture._id==matchId) {
@@ -774,22 +758,22 @@ async function KnockoutUpdateTournamentRounds(req, res) {
         });
 
         if (!matchFound) {
-            
+
             return res.status(404).json({ error: 'Match not found in any round' });
-            
+
         }
 
         const nextRoundIndex = roundIndex + 1;
-       
+
 
         const nextRound = tournament.rounds[nextRoundIndex];
 
         const targetMatchIndex = Math.floor(matchIndex / 2);
 
-        
+
         const winner = await ResultController.getMatchWinner(matchId);
         if (nextRoundIndex >= tournament.rounds.length) {
-            const NewWinnersList = tournament.winners; 
+            const NewWinnersList = tournament.winners;
             NewWinnersList.push(winner.winner);
             console.log("team with id" ,winner.winner,"won the tournament");
             await Tournament.findByIdAndUpdate(
@@ -799,20 +783,20 @@ async function KnockoutUpdateTournamentRounds(req, res) {
             );
             return res.status(404).json({ error: 'No next round found' });
         }
-        
-       
-  const TheMatchToBeUpdated = await Match.findById(nextRound.fixtures[targetMatchIndex]._id);
-  if (!TheMatchToBeUpdated) {
-    return res.status(404).json({ error: 'Match not found for next round fixture' });
-}
-if (matchIndex % 2 === 0) {
-    TheMatchToBeUpdated.team1 = winner.winner;
-} else {
-    TheMatchToBeUpdated.team2 = winner.winner;
-}
 
 
-   await TheMatchToBeUpdated.save();
+        const TheMatchToBeUpdated = await Match.findById(nextRound.fixtures[targetMatchIndex]._id);
+        if (!TheMatchToBeUpdated) {
+            return res.status(404).json({ error: 'Match not found for next round fixture' });
+        }
+        if (matchIndex % 2 === 0) {
+            TheMatchToBeUpdated.team1 = winner.winner;
+        } else {
+            TheMatchToBeUpdated.team2 = winner.winner;
+        }
+
+
+        await TheMatchToBeUpdated.save();
         await tournament.save();
 
         res.status(200).json({ message: 'Next round fixtures updated successfully' });
@@ -828,15 +812,15 @@ if (matchIndex % 2 === 0) {
 async function generateKnockoutChampionshipMatches(req,res) {
     const tournamentId = req.params.id;
     const tournament = await Tournament.findById(tournamentId);
-        if (!tournament) {
-            return res.status(404).json({ error: 'Tournament not found' });
-        };
-    
+    if (!tournament) {
+        return res.status(404).json({ error: 'Tournament not found' });
+    };
+
 
 
     const groupsWithMatches = tournament.groupsWithMatches;
 
-   
+
     const AllgroupWinners = [];
 
 
@@ -846,66 +830,66 @@ async function generateKnockoutChampionshipMatches(req,res) {
         AllgroupWinners.push(winners[0], winners[1]);
     }
 
- const teams = AllgroupWinners;
+    const teams = AllgroupWinners;
 
-        if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length))) {
-            throw new Error('Number of teams must be a power of 2 and at least 2');
-        }
+    if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length))) {
+        throw new Error('Number of teams must be a power of 2 and at least 2');
+    }
 
-        shuffleArray(teams);
+    shuffleArray(teams);
 
+    const fixtures = [];
+
+    const numMatches = teams.length / 2;
+    for (let i = 0; i < numMatches; i++) {
+        const match = new Match({
+            team1: teams [i * 2],
+            team2:  teams[i * 2 + 1],
+            tournament: tournamentId
+        });
+        await match.save();
+        fixtures.push(match);
+    }
+
+    const initialRound = {
+        title: 'Round 1',
+        fixtures: fixtures,
+    };
+
+    const rounds = [initialRound];
+
+    const numRounds = Math.log2(teams.length);
+
+    for (let i = 2; i <= numRounds; i++) {
+        const numMatches = teams.length / Math.pow(2, i);
         const fixtures = [];
 
-        const numMatches = teams.length / 2;
-        for (let i = 0; i < numMatches; i++) {
-             const match = new Match({
-                team1: teams [i * 2],
-                team2:  teams[i * 2 + 1],
-                tournament: tournamentId
-             });
-             await match.save();
+        for (let j = 0; j < numMatches; j++) {
+            const match = new Match({
+                tournament: tournamentId,
+            });
+            await MatchController.saveMatch(match);
+            console.log("m atch ",match);
             fixtures.push(match);
+            console.log("this the match id " , match._id);
+            console.log("fixtures saved ",fixtures)
+
         }
 
-        const initialRound = {
-            title: 'Round 1',
-            fixtures: fixtures,
+        const round = {
+            title: `Round ${i}`,
+            fixtures: fixtures
         };
-
-        const rounds = [initialRound];
-
-        const numRounds = Math.log2(teams.length);
-
-        for (let i = 2; i <= numRounds; i++) {
-            const numMatches = teams.length / Math.pow(2, i);
-            const fixtures = [];
-        
-            for (let j = 0; j < numMatches; j++) {
-                const match = new Match({
-                    tournament: tournamentId,
-                });
-                await MatchController.saveMatch(match);
-                console.log("m atch ",match);
-                  fixtures.push(match);
-                  console.log("this the match id " , match._id);
-                  console.log("fixtures saved ",fixtures)
-               
-            }
-        
-            const round = { 
-                title: `Round ${i}`, 
-                fixtures: fixtures
-            };
         console.log("round 2 " , round)
-            rounds.push(round);
-        }
-        
+        rounds.push(round);
+    }
 
-        await Tournament.findByIdAndUpdate(
-            tournamentId,
-            { rounds: rounds },
-            { new: true }
-        );
+
+    await Tournament.findByIdAndUpdate(
+        tournamentId,
+        { rounds: rounds },
+        { new: true }
+    );
 
 
 
@@ -918,7 +902,7 @@ async function generateKnockoutChampionshipMatches(req,res) {
 
 const determineGroupWinners = async (standingsId) => {
     try {
-        
+
         const groupStanding = await Standing.findById(standingsId).populate('standings').exec();
         if (!groupStanding) {
             throw new Error('Standing not found');
@@ -926,21 +910,21 @@ const determineGroupWinners = async (standingsId) => {
 
         const groupWinners = {};
 
-        
-        
-          
-            const groupStandings = groupStanding.standings;
 
-        
-            const sortedStandings = groupStandings.sort((a, b) => b.points - a.points);
 
-       
-            const groupWinner1 = sortedStandings[0].team;
-            const groupWinner2 = sortedStandings[1].team;
 
-      
-            groupWinners[groupStanding._id] = [groupWinner1, groupWinner2];
-        
+        const groupStandings = groupStanding.standings;
+
+
+        const sortedStandings = groupStandings.sort((a, b) => b.points - a.points);
+
+
+        const groupWinner1 = sortedStandings[0].team;
+        const groupWinner2 = sortedStandings[1].team;
+
+
+        groupWinners[groupStanding._id] = [groupWinner1, groupWinner2];
+
 
         return groupWinners;
     } catch (error) {
@@ -953,20 +937,20 @@ const determineGroupWinners = async (standingsId) => {
 async function UpdateGroupStandingAfterMatch(req, res) {
     try {
         const matchId = req.params.matchID;
-        
+
         const match = await Match.findById(matchId);
         if (!match) {
             return res.status(404).json({ error: 'Match not found' });
         }
-        
+
         const result = await ResultController.getResultByMatch(matchId);
         if (!result) {
             return res.status(404).json({ error: 'Result not found' });
         }
 
-        
-        
-        
+
+
+
 
         const tournamentId = match.tournament;
         const tournament = await Tournament.findById(tournamentId)
@@ -975,7 +959,7 @@ async function UpdateGroupStandingAfterMatch(req, res) {
         };
 
         const groupsWithMatches = tournament.groupsWithMatches;
-console.log(groupsWithMatches);
+        console.log(groupsWithMatches);
         let groupBelongedTo = null;
         for (const group of groupsWithMatches) {
             const matchesInGroup = group.matches.map(match => match.toString());
@@ -1029,60 +1013,70 @@ console.log(groupsWithMatches);
 };
 
 
+async function getTournamentsByUserId(req, res) {
+    const userId = req.params.userId;
 
+    try {
+        const tournaments = await Tournament.find({user:userId});
+        res.status(200).json({ tournaments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
 const addRefereesAndStadiumsToTournament = async (req, res) => {
     const  tournamentId  = req.params.id;
     const { referees, stadiums } = req.body;
-  
+
     try {
-      
-      const tournament = await Tournament.findById(tournamentId);
-      if (!tournament) {
-        return res.status(404).json({ error: 'Tournament not found' });
-      }
-  
 
-      if (!referees || !stadiums) {
-        return res.status(400).json({ error: 'Referees and stadiums are required' });
-      }
-  
-      const validReferees = await Promise.all(
-        referees.map(async (refereeId) => {
-          const referee = await User.findById(refereeId);
-          
-          if (!referee) {
-            throw new Error(`Referee with ID ${refereeId} not found`);
-          }
-          return referee;
-        })
-      );
-      tournament.referees.push(...validReferees);
-  
- 
-      const validStadiums = await Promise.all(
-        stadiums.map(async (stadiumId) => {
-          const stadium = await StadiumModel.findById(stadiumId);
-          if (!stadium) {
-            throw new Error(`Stadium with ID ${stadiumId} not found`);
-          }
-          return stadium;
-        })
-      );
-      tournament.Staduims.push(...validStadiums);
-  
-      
-      await tournament.save();
-  
-      res.status(200).json({ message: 'Referees and stadiums added to the tournament successfully' });
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
+
+        if (!referees || !stadiums) {
+            return res.status(400).json({ error: 'Referees and stadiums are required' });
+        }
+
+        const validReferees = await Promise.all(
+            referees.map(async (refereeId) => {
+                const referee = await User.findById(refereeId);
+
+                if (!referee) {
+                    throw new Error(`Referee with ID ${refereeId} not found`);
+                }
+                return referee;
+            })
+        );
+        tournament.referees.push(...validReferees);
+
+
+        const validStadiums = await Promise.all(
+            stadiums.map(async (stadiumId) => {
+                const stadium = await StadiumModel.findById(stadiumId);
+                if (!stadium) {
+                    throw new Error(`Stadium with ID ${stadiumId} not found`);
+                }
+                return stadium;
+            })
+        );
+        tournament.Staduims.push(...validStadiums);
+
+
+        await tournament.save();
+
+        res.status(200).json({ message: 'Referees and stadiums added to the tournament successfully' });
     } catch (error) {
-      console.error('Error adding referees and stadiums to the tournament:', error);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error('Error adding referees and stadiums to the tournament:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-  };
+};
 
 
-  const getRefereesAndStadiumsForTournament = async (req, res) => {
+const getRefereesAndStadiumsForTournament = async (req, res) => {
     const tournamentId = req.params.id;
 
     try {
@@ -1093,10 +1087,10 @@ const addRefereesAndStadiumsToTournament = async (req, res) => {
             return res.status(404).json({ error: 'Tournament not found' });
         }
 
-    
+
         const { referees, Staduims } = tournament;
 
-       
+
         res.status(200).json({ referees, Staduims });
     } catch (error) {
         console.error('Error retrieving referees and stadiums for the tournament:', error);
@@ -1110,15 +1104,15 @@ const getFixturesKnockout = async (req, res) => {
         // Fetch tournament details from the database
         const tournamentId = req.params.id;
         const tournament = await Tournament.findById(tournamentId);
-        
+
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
         }
 
-      
+
         const fixturesByRound = tournament.rounds.map(round => round.fixtures.map(fixture => fixture._id));
 
-       
+
         res.status(200).json({ fixturesByRound });
     } catch (error) {
         console.error('Error fetching tournament fixtures:', error);
@@ -1128,18 +1122,18 @@ const getFixturesKnockout = async (req, res) => {
 
 const getMatchesFromGroupsWithMatches = async (req, res) => {
     try {
-        
+
         const tournamentId = req.params.id;
         const tournament = await Tournament.findById(tournamentId);
-        
+
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
         }
 
-       const gamesByGroup = tournament.groupsWithMatches.map(group => group.matches);
+        const gamesByGroup = tournament.groupsWithMatches.map(group => group.matches);
 
 
-      
+
         res.status(200).json({ gamesByGroup });
     } catch (error) {
         console.error('Error fetching matches from groupsWithMatches:', error);
@@ -1148,97 +1142,97 @@ const getMatchesFromGroupsWithMatches = async (req, res) => {
 };
 
 async function GetGroupsAndStandings(req,res) {
-try {
-     
-    const tournamentId = req.params.id;
-    const tournament = await Tournament.findById(tournamentId);
-    if (!tournament) {
-        return res.status(404).json({ error: 'Tournament not found' });
-    }
+    try {
 
-    const StandingsByGroup = tournament.groupsWithMatches.map(group => group.standings);
-    res.status(200).json({ StandingsByGroup });
-} catch (error) {
-    console.error('Error fetching matches from groupsWithMatches:', error);
+        const tournamentId = req.params.id;
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
+        const StandingsByGroup = tournament.groupsWithMatches.map(group => group.standings);
+        res.status(200).json({ StandingsByGroup });
+    } catch (error) {
+        console.error('Error fetching matches from groupsWithMatches:', error);
         res.status(500).json({ error: 'Internal server error' });
-}
+    }
 };
 
 async function FixturesByDayKnockout  (req, res)  {
-        try {
-            const tournamentId =req.params.id;
-            const day = req.params.day;
-    
-            
-            const tournament = await Tournament.findById(tournamentId);
-    
-            
-            if (!tournament) {
-                return res.status(404).json({ error: 'Tournament not found' });
-            }
-    
-            
-            const fixturesForDay = [];
-    
-           
-            for (const round of tournament.rounds) {
-             
-                for (const fixture of round.fixtures) {
+    try {
+        const tournamentId =req.params.id;
+        const day = req.params.day;
 
-                    const match = await Match.findById(fixture);
-                   
-                    if (match && match.startDay == day) {
-                    
-                        fixturesForDay.push(match);
-                    }
+
+        const tournament = await Tournament.findById(tournamentId);
+
+
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
+
+        const fixturesForDay = [];
+
+
+        for (const round of tournament.rounds) {
+
+            for (const fixture of round.fixtures) {
+
+                const match = await Match.findById(fixture);
+
+                if (match && match.startDay == day) {
+
+                    fixturesForDay.push(match);
                 }
             }
-    
-   
-            res.status(200).json({ fixtures : fixturesForDay });
-        } catch (error) {
-            console.error('Error fetching fixtures for the day:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    };
-    
-    const getMatchesFromGroupsWithMatchesByday = async (req, res) => {
-        try {
-            const day = req.params.day;
-            const tournamentId = req.params.id;
-            const tournament = await Tournament.findById(tournamentId);
-            
-            if (!tournament) {
-                return res.status(404).json({ error: 'Tournament not found' });
-            }
-            const fixturesForDay= [];
-    
-            const gamesByGroup = tournament.groupsWithMatches.map(group => group.matches).flat();
-    for (const game of gamesByGroup){
-        const match = await Match.findById(game);
-        if (match && match.startDay == day) {
-                    
-            fixturesForDay.push(match);
         }
 
+
+        res.status(200).json({ fixtures : fixturesForDay });
+    } catch (error) {
+        console.error('Error fetching fixtures for the day:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-    
-          
-            res.status(200).json({ fixtures : fixturesForDay});
-        } catch (error) {
-            console.error('Error fetching matches from groupsWithMatches:', error);
-            res.status(500).json({ error: 'Internal server error' });
+};
+
+const getMatchesFromGroupsWithMatchesByday = async (req, res) => {
+    try {
+        const day = req.params.day;
+        const tournamentId = req.params.id;
+        const tournament = await Tournament.findById(tournamentId);
+
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
         }
-    };
+        const fixturesForDay= [];
+
+        const gamesByGroup = tournament.groupsWithMatches.map(group => group.matches).flat();
+        for (const game of gamesByGroup){
+            const match = await Match.findById(game);
+            if (match && match.startDay == day) {
+
+                fixturesForDay.push(match);
+            }
+
+        }
+
+
+        res.status(200).json({ fixtures : fixturesForDay});
+    } catch (error) {
+        console.error('Error fetching matches from groupsWithMatches:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
 
-    const getTournamentbyMatch = async(req,res) =>{
-        
-        try{
+const getTournamentbyMatch = async(req,res) =>{
+
+    try{
         const matchId = req.params.matchID;
         const match = await Match.findById(matchId);
-        const tournamentId = match.tournament ; 
+        const tournamentId = match.tournament ;
         const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
@@ -1248,39 +1242,39 @@ async function FixturesByDayKnockout  (req, res)  {
         console.error('Error fetching matches from groupsWithMatches:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-        
-    };
+
+};
 
 
-    const getTeamsOftournament = async (req,res) =>{
-       
-       try {
-       
-        const tournamentId = req.params.id; 
+const getTeamsOftournament = async (req,res) =>{
+
+    try {
+
+        const tournamentId = req.params.id;
         const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
         }
 
-    
+
         const teams = tournament.teams;
-    data =[];
-    for (const team of teams){
-        const TeamItem = await Team.findById(team);
-        if (team) {       
-            data.push(TeamItem);
+        data =[];
+        for (const team of teams){
+            const TeamItem = await Team.findById(team);
+            if (team) {
+                data.push(TeamItem);
+            }
         }
+
+        res.status(200).send(data)
     }
 
-    res.status(200).send(data)
-    }
-    
     catch(error){
         console.error('Error fetching teams from tournament:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-    
-    }
+
+}
 
 
 module.exports={
