@@ -140,8 +140,10 @@ const signupUser = async (req, res) => {
 
 const refresh = (req, res) => {
     const cookies = req.cookies
-
-    if (!cookies?.jwt) return res.status(401).json({message: 'You need to login'})
+    if (!cookies || !cookies.jwt) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    if (!cookies.jwt) return res.status(401).json({message: 'You need to login'})
 
     const refreshToken = cookies.jwt
 
@@ -183,9 +185,11 @@ const refresh = (req, res) => {
 const checkRoles = async (req, res) => {
 
     const cookies = req.cookies
-    if (!cookies?.jwt) return res.status(401).json({message: 'Unauthorized'})
+    if (!cookies || !cookies.jwt) {
+        return res.status(401).json({ message: 'You need to login' });
+    }
     jwt.verify(
-        cookies?.jwt,
+        cookies.jwt,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.status(403).json({message: 'Forbidden'})
@@ -527,9 +531,16 @@ async function getRoleRequests(req,res){
 
 async function getPlayerTournaments(req,res){
     try{
-        const user = req.user;
-        const data = await Tournament.find();
-        const myTournaments = data.filter(tournament=>tournament.teams.some(team=>team._id && user.currentTeam && team._id.equals(user.currentTeam)));
+        let myTournaments
+        data = await Tournament.find();
+        if (Object.keys(req.query).length === 0) {
+            const user = req.user;
+            myTournaments = data.filter(tournament=>tournament.teams.some(team=>team._id && user.currentTeam && team._id.equals(user.currentTeam)));
+        } else {
+            const userId = req.query.userId;
+            const user = await User.findById(userId );
+            myTournaments = data.filter(tournament=>tournament.teams.some(team=>team._id && user.currentTeam && team._id.equals(user.currentTeam)));
+        }
         res.status(200).json(myTournaments);
     }catch(e){
         res.status(400).json({error:e.message})
@@ -547,7 +558,7 @@ async function getTeamsByTournament(req,res){
                     try {
                         const team = await Team.findById(t);
                         if (team) {
-                            if(user.currentTeam.equals(t)){
+                            if(user?.currentTeam.equals(t)){
                                 myTeam = team;
                                 teams.push(team)
                             }else{
@@ -669,7 +680,7 @@ async function getallPlayers(req, res) {
 
 async function getPlayersByIds(playerIds) {
     try {
-        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');;
+        const players = await User.find({ _id: { $in: playerIds } }).select('fullname position jersyNumber');
         return players.map(player => ({
             id :player._id,
             fullname: player.fullname,
@@ -731,7 +742,25 @@ async function getallCoachesWithNoTeam(req, res) {
     } catch (err) {
         res.status(400).json({error: err});
     }
-}
+};
+
+async function getAllReferees (req, res) {
+    try {
+        
+        const referees = await User.find({ roles: 20 });
+
+        if (!referees) {
+            return res.status(404).json({ message: 'mafamesh ' });
+        }
+
+        res.status(200).json(referees);
+    } catch (error) {
+        console.error('Error getting referees:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 
 
 async function likedBy(req, res) {
@@ -831,5 +860,6 @@ module.exports = {
     getPlayerTournaments,
     getTeamsByTournament,
     likedBy,
-    checkLiked
+    checkLiked,
+    getAllReferees,
 }

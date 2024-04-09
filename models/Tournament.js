@@ -19,7 +19,7 @@ const FriOrComp = {
     Pending: 'Pending',
     Finished: 'Finished',
     OnGoing:'OnGoing',
-    Paid: 'Paid'
+    
   };
 
   const access = {
@@ -41,38 +41,81 @@ const TournamentSchema = new Schema({
     numberOfPlayers: Number,
     numberOfTeams:Number,
     logo: String,
-    TournamentType : [{
+    TournamentType: {
         type : String,
         enum : Object.values(TournamentType),
         default : TournamentType.League
-    }],
-    TournamentStatus : [{
+    },
+    TournamentStatus : {
         type : String,
         enum : Object.values(TournamentStatus),
         default : TournamentStatus.Pending
-    }],
-    access : [{
+    },
+    access : {
         type : String,
         enum : Object.values(access),
         default : access.Private
-    }],
-    FriOrComp : [{
+    },
+    FriOrComp : {
         type : String,
         enum : Object.values(FriOrComp),
         default : FriOrComp.Competitive
-    }],
+    },
     teams: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team'
     }],
-    matches: [{
+    matches: [[{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'match'
+        ref: 'Match'
+    }]],
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    rounds: [{
+        title: String,
+        fixtures: [{
+            match: { 
+                type: mongoose.Schema.Types.ObjectId, 
+                ref: 'Match' },   
+        }]
     }],
-    user: [{
+    groupsWithMatches: [{
+        teams: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Team' }],
+        matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match' }],
+        standings: { type: mongoose.Schema.Types.ObjectId, ref: 'Standing' }
+    }],
+    followers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    rating: {
+        type: Schema.Types.Mixed,
+        default: {
+            '5 stars': 0,
+            '4 stars': 0,
+            '3 stars': 0,
+            '2 stars': 0,
+            '1 star': 0,
+        }
+    },
+    winners: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'
+    }],
+    referees: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    Staduims: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Stadium'
+    }],
+    GPended:{
+        type:Boolean,
+        default:false
+    },
 });
 
 module.exports = mongoose.model('Tournament', TournamentSchema);

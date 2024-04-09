@@ -15,7 +15,7 @@ const stripe = require("stripe")("sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUq
 const stripeWebhookSecret = "whsec_DkhMYus3KybNiTsCJ5SlJO3a39ZN0ShO";
 const chatController = require('./Controller/ChatController')
 // Middleware
-app.use(Bodyparser.json());
+app.use(Bodyparser.json({ limit: '50mb' }));
 app.use(cors());
 app.use(cookieParser());
 require("dotenv").config();
@@ -40,9 +40,15 @@ app.use("/", googleAuth);
 // Routes
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
-
+app.use('/uploads', express.static('uploads'));
 const TournamentRouter = require("./routes/Tournament");
 app.use("/Tournament", TournamentRouter);
+
+const StandingsRouter = require("./routes/StandingsRouter");
+app.use("/Standings", StandingsRouter);
+
+const StadiumRouter = require("./routes/Stadium");
+app.use("/Stadium", StadiumRouter);
 
 const TeamRouter = require("./routes/Team");
 app.use("/Team", TeamRouter);
@@ -104,7 +110,7 @@ const MatchRouter = require("./routes/Match");
 app.use("/Match", MatchRouter);
 
 // Server setup
-app.use("/api",ResultRouter);
+app.use("/result",ResultRouter);
 const server=http.createServer(app);
 const io=require("socket.io")(server);
 chatSocket=io;

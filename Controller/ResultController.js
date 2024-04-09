@@ -1,5 +1,7 @@
-//je change le nom de l'entité ici et partout
+
 const Result = require('../models/Result')
+const Match = require('../models/Match');
+
 
 async function add (req,res){
     console.log(req.body)
@@ -76,4 +78,56 @@ async function deleteResult (req,res){
 
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteResult}
+
+async function getResultByMatch (matchId){
+    try{
+  
+        const result = await Result.findOne({ match: matchId });
+        return result ; 
+
+
+    }catch(err){
+        console.log(err);
+
+
+    }
+
+}
+
+
+
+
+const getMatchWinner = async (matchId) => {
+    try {
+        const result = await Result.findOne({ match: matchId });
+        if (!result) {
+            throw new Error('Result not found for the match');
+        }
+        const match = await Match.findById(matchId);
+        if (!match) {
+            throw new Error('Match not found');
+        }
+        let winner = null;
+        if (result.team1Goals > result.team2Goals) {
+            winner = match.team1;
+        } else if (result.team2Goals > result.team1Goals) {
+            winner = match.team2;
+        } 
+        if (result.team1Goals === result.team2Goals) {
+            return { winner: null, draw: [match.team1, match.team2] };
+        }
+
+        return { winner: winner };
+    } catch (error) {
+        console.error('Error getting match winner:', error);
+        throw new Error('Internal server error');
+    }
+};
+
+
+
+
+
+module.exports={add,getall,getbyid,getbyname,update,deleteResult,
+    getResultByMatch,
+    getMatchWinner}

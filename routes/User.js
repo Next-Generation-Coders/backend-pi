@@ -19,7 +19,7 @@ router.get('/check-request',tokenVerif.requireAuth,UserController.getUserRoleReq
 
 router.get('/player-tournaments',tokenVerif.requireAuth,UserController.getPlayerTournaments);
 
-router.get('/player-teams/:id',tokenVerif.requireAuth,UserController.getTeamsByTournament);
+router.get('/player-teams/:id',UserController.getTeamsByTournament);
 
 router.post('/login',UserController.loginUser);
 
@@ -44,7 +44,7 @@ router.get('/for-chat',tokenVerif.requireAuth,UserController.getUsersForChat)
 
 router.put('/avatar',tokenVerif.requireAuth,upload.single('avatar'),UserController.saveAvatar)
 
-
+router.get("/getAllReferees" ,UserController.getAllReferees );
 
 //CRUD
 router.post('/add',UserController.add);

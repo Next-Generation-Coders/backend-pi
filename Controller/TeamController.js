@@ -51,8 +51,15 @@ async function getall (req,res){
 
 async function getbyid (req,res){
     try{
-        const data = await Team.findById(req.params.id)
-        res.status(200).send(data)
+        const team = await Team.findById(req.params.id)
+        if (!team) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+        const playerNames = await getPlayersByIds(team.players);
+        const coachName = await getPlayersByIds(team.coach);
+        const teamManagerName = await getPlayersByIds(team.team_manager);
+        const teamWithPlayerNames = { ...team.toObject(), playerNames ,coachName,teamManagerName };
+        res.status(200).json(teamWithPlayerNames);
     }catch(err){
         res.status(400).json({error:err});
     }
@@ -218,7 +225,8 @@ async function getTeambyTeamManger (req,res){
         }
         const playerNames = await getPlayersByIds(team.players);
         const coachName = await getPlayersByIds(team.coach);
-        const teamWithPlayerNames = { ...team.toObject(), playerNames ,coachName };
+        const teamManagerName = await getPlayersByIds(team.team_manager);
+        const teamWithPlayerNames = { ...team.toObject(), playerNames ,coachName, teamManagerName };
         res.status(200).json(teamWithPlayerNames);
     } catch (error) {
         console.error(error);
