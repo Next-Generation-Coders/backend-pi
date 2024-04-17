@@ -313,14 +313,17 @@ async function getTeamRating(req, res) {
 
         // Return the team's rating
         console.log(sumteamRating+"....")
-        team.rating=sumteamRating ;
-        await team.save();
+        if (sumteamRating != team.rating) {
+            team.rating = sumteamRating;
+            await team.save();
+        }
         
         res.status(200).json({ rating: sumteamRating });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 }
+
 
 function sumOfDigits(number) {
     // Convert number to string
