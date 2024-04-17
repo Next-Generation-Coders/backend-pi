@@ -3,6 +3,8 @@ const Team = require('../models/Team');
 const User = require('../models/User');
 const Role = require('../models/User');
 const Coach=require('../models/User');
+const Tournament=require('../models/Tournament');
+const Match=require('../models/Match');
 
 const { getPlayersByIds } = require("../Controller/UserController")
 async function add(req, res) {
@@ -51,8 +53,15 @@ async function getall (req,res){
 
 async function getbyid (req,res){
     try{
-        const data = await Team.findById(req.params.id)
-        res.status(200).send(data)
+        const team = await Team.findById(req.params.id)
+        if (!team) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+        const playerNames = await getPlayersByIds(team.players);
+        const coachName = await getPlayersByIds(team.coach);
+        const teamManagerName = await getPlayersByIds(team.team_manager);
+        const teamWithPlayerNames = { ...team.toObject(), playerNames ,coachName,teamManagerName };
+        res.status(200).json(teamWithPlayerNames);
     }catch(err){
         res.status(400).json({error:err});
     }
@@ -218,7 +227,8 @@ async function getTeambyTeamManger (req,res){
         }
         const playerNames = await getPlayersByIds(team.players);
         const coachName = await getPlayersByIds(team.coach);
-        const teamWithPlayerNames = { ...team.toObject(), playerNames ,coachName };
+        const teamManagerName = await getPlayersByIds(team.team_manager);
+        const teamWithPlayerNames = { ...team.toObject(), playerNames ,coachName, teamManagerName };
         res.status(200).json(teamWithPlayerNames);
     } catch (error) {
         console.error(error);
@@ -303,14 +313,17 @@ async function getTeamRating(req, res) {
 
         // Return the team's rating
         console.log(sumteamRating+"....")
-        team.rating=sumteamRating ;
-        await team.save();
+        if (sumteamRating != team.rating) {
+            team.rating = sumteamRating;
+            await team.save();
+        }
         
         res.status(200).json({ rating: sumteamRating });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 }
+
 
 function sumOfDigits(number) {
     // Convert number to string
@@ -322,4 +335,41 @@ function sumOfDigits(number) {
     return sum;
 }
 
-module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkTeam_manager,updateXTeam,getTeambyCoach,getTeambyTeamManger,addCoachToTeam,getTeamRating}
+async function getTournaments(req, res) {
+    try {
+        const teamId = req.query.teamId;
+        const matches = await Match.find({
+            $or: [{ team1: teamId }, { team2: teamId }]
+        })
+        .populate('team1')
+        .populate('team2')
+        .populate('tournament');        
+        res.status(200).json(matches);
+           
+       } catch (error) {
+       console.error(error);
+       res.status(500).json({ error: 'Internal server error' });
+}
+}
+
+async function removePlayerFromTeam(req, res) {
+    try {
+        const player = await User.findById(req.query.idPlayer);
+        if(!player){
+            return res.status(404).json({ error: 'Player not found' });
+        }
+        //const team=player.currentTeam ;
+        const team = await Team.findById(player?.currentTeam);
+        team.players.pull(player?.id);
+        team.save() ;
+
+        player.currentTeam="" ;
+        player.save();
+           
+       } catch (error) {
+       console.error(error);
+       res.status(500).json({ error: 'Internal server error' });
+}
+}
+
+module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkTeam_manager,updateXTeam,getTeambyCoach,getTeambyTeamManger,addCoachToTeam,getTeamRating,getTournaments,removePlayerFromTeam}
