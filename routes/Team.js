@@ -38,4 +38,8 @@ router.get('/getTeamRating/:id',TeamController.getTeamRating);
 
 router.get('/getTeamsByMatch/:matchId',LineupController.getTeamsByMatch);
 
+router.get('/getTournaments',TeamController.getTournaments);
+
+router.delete('/removePlayerFromTeam',TeamController.removePlayerFromTeam);
+
 module.exports = router;
