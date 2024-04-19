@@ -31,7 +31,7 @@ router.get('/getByUserId/:userId', TournamentControlle.getTournamentsByUserId);
 
 router.get("/DoubleLegLeagueMatchGeneration/:id", TournamentControlle.generateDoubleLegSchedule)
 
-router.get("/UserTournaments",tokenVerif.requireAuth , TournamentControlle.getTournamentsByUserId)
+router.get("/UserTournaments",tokenVerif.requireAuth , TournamentControlle.getTournamentsByUserIdForAdem)
 
 router.put("/StartTournament/:id", TournamentControlle.startTournament);
 
