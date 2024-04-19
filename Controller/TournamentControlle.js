@@ -1275,7 +1275,17 @@ const getTeamsOftournament = async (req,res) =>{
     }
 
 }
+async function getTournamentsByUserIdForAdem(req, res) {
+    const userId = req.params.userId;
 
+    try {
+        const tournaments = await Tournament.find({user:userId});
+        res.status(200).json({ tournaments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
 module.exports={
     add,
@@ -1309,5 +1319,6 @@ module.exports={
     FixturesByDayKnockout,
     getMatchesFromGroupsWithMatchesByday,
     getTournamentbyMatch,
-    getTeamsOftournament
+    getTeamsOftournament,
+    getTournamentsByUserIdForAdem
 }
