@@ -1276,7 +1276,7 @@ const getTeamsOftournament = async (req,res) =>{
 
 }
 async function getTournamentsByUserIdForAdem(req, res) {
-    const userId = req.params.userId;
+    const userId = req.user;
 
     try {
         const tournaments = await Tournament.find({user:userId});
