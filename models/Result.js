@@ -1,13 +1,25 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema
-
+// const GoalSchema = new Schema({
+//   goalNumber: {
+//       type: Number,
+//       required: true
+//   },
+//   time: {
+//       type: String, // Assuming time will be stored as a string (e.g., "45'")
+//       required: true
+//   }
+// });
 const Result = new Schema({
     match: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Match',
         required: true
       },
+      // team1Goals: [GoalSchema],
+      // team2Goals: [GoalSchema],
+
       team1Goals: [{
         //time: { type: String }, // Time of the goal
         type: Number,

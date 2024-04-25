@@ -105,6 +105,61 @@ router.get('/resultsMatches', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+router.get('/resultsSorted', async (req, res) => {
+  try {
+    // Get the current date
+    const currentDate = new Date();
+
+    // Find the results
+    const results = await Result.find().populate({ 
+      path: 'match',
+      populate: [
+        { path: 'team1', model: 'Team' },
+        { path: 'team2', model: 'Team' }
+      ]
+    });
+
+    if (!results) {
+      return res.status(404).json({ message: 'Results not found' });
+    }
+
+    // Classify results into finished and upcoming
+    const finishedResults = [];
+    const upcomingResults = [];
+
+    results.forEach(result => {
+      // Ensure result.match exists and is not null
+      if (result.match && result.match.date) {
+        const matchDate = new Date(result.match.date);
+
+        // Compare the match date with the current date
+        if (matchDate < currentDate) {
+
+          // Match has already occurred
+          finishedResults.push(result);
+        } else {
+
+
+        
+
+          // Match is scheduled for the future
+          upcomingResults.push(result);
+        }
+      }
+    });
+    // Inside the forEach loop
+    // console.log('Match Date:');
+
+    // console.log('Match Date:', upcomingResults);
+
+    // Send the classified results as JSON response
+    res.json({ finishedResults, upcomingResults });
+  } catch (error) {
+    console.error('Error fetching results:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Route to get the two teams playing in the match by match ID
 router.get('/teams/:matchId', async (req, res) => {
   const { matchId } = req.params;
