@@ -135,7 +135,44 @@ server.listen(3000,console.log("server is running"))
 io.on("connection", (socket) => {
     console.log('Client connected');
 
-
+    // socket.on('goal', async ({ team, matchID }) => {
+    //   try {
+    //     // Update match data in the database based on the team that scored
+    //     console.log(matchID);
+    //     const result = await Result.findOne({ match: matchID });
+    
+    //     if (!result) {
+    //       throw new Error('Match not found');
+    //     }
+    
+    //     const goalTime = new Date(); // Get the current timestamp
+    
+    //     if (team === 'team1') {
+    //       console.log("team1 goal");
+    //       result.team1Goals.push(goalTime); // Store the time of the goal for team1
+    //     } else if (team === 'team2') {
+    //       console.log("team2 goal");
+    //       result.team2Goals.push(goalTime); // Store the time of the goal for team2
+    //     }
+    
+    //     await result.save();
+    
+    //     // Emit scoreUpdate event to all connected clients with updated score information
+    //     io.emit('scoreUpdate', { 
+    //       team1Goals: {
+    //         count: result.team1Goals.length,
+    //         latestGoalTime: result.team1Goals[result.team1Goals.length - 1] // Get the latest goal time for team1
+    //       },
+    //       team2Goals: {
+    //         count: result.team2Goals.length,
+    //         latestGoalTime: result.team2Goals[result.team2Goals.length - 1] // Get the latest goal time for team2
+    //       }
+    //     });
+    //   } catch (error) {
+    //     console.error('Error:', error.message);
+    //   }
+    // });
+    
   socket.on('goal', async ({ team,matchID }) => {
     try {
       // Update match data in the database based on the team that scored
