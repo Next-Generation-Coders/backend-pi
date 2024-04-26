@@ -313,9 +313,11 @@ async function getTeamRating(req, res) {
 
         // Return the team's rating
         console.log(sumteamRating+"....")
-        if (sumteamRating != team.rating) {
+        if (sumteamRating != team.rating || isNaN(sumteamRating)) {
             team.rating = sumteamRating;
             await team.save();
+        }else{
+            sumteamRating=team.rating
         }
         
         res.status(200).json({ rating: sumteamRating });
