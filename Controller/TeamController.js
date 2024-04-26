@@ -121,7 +121,7 @@ async function addPlayerToTeam(req, res) {
             const existingPlayer = await User.findOne({ email: req.body.email });
             if (existingPlayer) {
                 // Check if the existing player is already part of a team
-                const existingTeam = await Team.findOne({ players: existingPlayer._id });
+                /* const existingTeam = await Team.findOne({ players: existingPlayer._id });
                 if (existingTeam) {
                     // Remove the player from the existing team
                     existingTeam.players.pull(existingPlayer._id);
@@ -132,7 +132,12 @@ async function addPlayerToTeam(req, res) {
                 await existingPlayer.save();
                 const team = await Team.findOne({ team_manager: coach._id });
                 team.players.push(existingPlayer._id);
-                await team.save();
+                await team.save(); */
+                req.body.roles = [10, 11];
+                const player = await User.findByIdAndUpdate(existingPlayer._id, req.body);
+                player.roles=[10,11]  ;
+                await player.save();
+                return res.status(200).json({ message: 'Player updtated successfully' });
             } else {
                 // Create a new player if they don't exist
                 const player = new User(req.body);

@@ -17,6 +17,10 @@ router.put('/update/:id',MatchController.update);
 
 router.delete('/delete/:id',MatchController.deleteMatch);
 
+router.get('/getTodaysMatches',MatchController.getTodaysMatches);
+
+router.get('/getClosestMatch',MatchController.getClosestMatch);
+
 module.exports = router;
 
 
