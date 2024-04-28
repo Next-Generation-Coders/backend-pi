@@ -133,6 +133,13 @@ async function addPlayerToTeam(req, res) {
                 const team = await Team.findOne({ team_manager: coach._id });
                 team.players.push(existingPlayer._id);
                 await team.save(); */
+                existingPlayer.currentTeam=coach.currentTeam;
+                existingPlayer.teams.push(coach.currentTeam)
+                await existingPlayer.save();
+                const team = await Team.findOne({ team_manager: coach._id });
+                team.players.push(existingPlayer._id);
+                await team.save();
+                
                 req.body.roles = [10, 11];
                 const player = await User.findByIdAndUpdate(existingPlayer._id, req.body);
                 player.roles=[10,11]  ;

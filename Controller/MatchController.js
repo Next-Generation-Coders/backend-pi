@@ -114,40 +114,4 @@ async function saveMatch (game){
     }
 }
 
-async function getTodaysMatches(req, res) {
-    try {
-        // Get today's date
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set time to beginning of the day
-
-        // Find matches for today
-        const matches = await Match.find({
-            date: { $gte: today, $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) } // Matches for today (from beginning to end of the day)
-        });
-
-        res.status(200).json(matches);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-}
-
-
-async function getClosestMatch(req, res) {
-    try {
-        // Get today's date
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set time to beginning of the day
-
-        // Find the closest match to today's date
-        const closestMatch = await Match.find({
-            date: { $gte: today }
-        });
-
-        res.status(200).json(closestMatch);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-}
-module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches,saveMatch,getTodaysMatches,getClosestMatch}
+module.exports={add,getall,getbyid,getbyname,update,deleteMatch,getRefereeMatches,saveMatch}
