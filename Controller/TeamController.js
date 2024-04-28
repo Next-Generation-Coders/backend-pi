@@ -133,6 +133,13 @@ async function addPlayerToTeam(req, res) {
                 const team = await Team.findOne({ team_manager: coach._id });
                 team.players.push(existingPlayer._id);
                 await team.save(); */
+                existingPlayer.currentTeam=coach.currentTeam;
+                existingPlayer.teams.push(coach.currentTeam)
+                await existingPlayer.save();
+                const team = await Team.findOne({ team_manager: coach._id });
+                team.players.push(existingPlayer._id);
+                await team.save();
+                
                 req.body.roles = [10, 11];
                 const player = await User.findByIdAndUpdate(existingPlayer._id, req.body);
                 player.roles=[10,11]  ;
@@ -362,21 +369,37 @@ async function getTournaments(req, res) {
 async function removePlayerFromTeam(req, res) {
     try {
         const player = await User.findById(req.query.idPlayer);
-        if(!player){
+        if (!player) {
             return res.status(404).json({ error: 'Player not found' });
         }
-        //const team=player.currentTeam ;
-        const team = await Team.findById(player?.currentTeam);
-        team.players.pull(player?.id);
-        team.save() ;
 
-        player.currentTeam="" ;
-        player.save();
-           
-       } catch (error) {
-       console.error(error);
-       res.status(500).json({ error: 'Internal server error' });
+        // Find the team
+        const team = await Team.findById(player.currentTeam);
+        if (!team) {
+            return res.status(404).json({ error: 'Team not found' });
+        }
+
+        // Remove the player from the team's players array
+        const playerIndex = team.players.indexOf(player.id);
+        if (playerIndex !== -1) {
+            team.players.splice(playerIndex, 1);
+        }
+
+        // Save the team
+        await team.save();
+
+        // Update the player's currentTeam field
+        player.currentTeam = null; // or set it to another value as needed
+
+        // Save the player
+        await player.save();
+
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 }
-}
+
 
 module.exports={add,getall,getbyid,getbyname,update,deleteTeam,addPlayerToTeam,checkTeam_manager,updateXTeam,getTeambyCoach,getTeambyTeamManger,addCoachToTeam,getTeamRating,getTournaments,removePlayerFromTeam}
