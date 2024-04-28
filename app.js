@@ -38,6 +38,9 @@ require("./auth/google-auth")(passport);
 app.use("/", googleAuth);
 
 // Routes
+const streamRoutes = require("./routes/Stream");
+app.use("/stream", streamRoutes);
+
 const userRouter = require("./routes/User");
 app.use("/User", userRouter);
 app.use('/uploads', express.static('uploads'));

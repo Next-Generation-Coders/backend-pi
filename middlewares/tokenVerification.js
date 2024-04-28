@@ -24,7 +24,7 @@ const requireAdmin = async (req,res,next) => {
 
     if (!authorization) {
         res.status(401).json({error: "Authorization is required!"})
-   }
+    }
 
     const token = authorization.split(' ')[1]
     try{
@@ -85,9 +85,9 @@ const requireOrganizer = async (req,res,next)=>{
     const token = authorization.split(' ')[1]
     try{
         let authorized=false;
-        const { _id } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-        const user = await User.findById(_id);
-        user.roles.forEach(role=>{
+        const { user } = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const u = await User.findOne({email:user.email});
+        u.roles.forEach(role=>{
             if(role === 13){
                 authorized = true;
             }
@@ -95,7 +95,7 @@ const requireOrganizer = async (req,res,next)=>{
         if(!authorized){
             res.status(403).json({error:"Unauthorized"});
         }else{
-            req.user = user;
+            req.user = u;
             next()
         }
     }catch(err){
@@ -113,8 +113,7 @@ const requirePlayer = async (req,res,next) => {
     const token = authorization.split(' ')[1]
     try{
         let authorized=false;
-        const  u = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-        const user = await User.findById(u._id);
+        const {user} = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         user.roles.forEach(role=>{
             if(role === 11){
                 authorized = true;
