@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/backend-pi.iml" filepath="$PROJECT_DIR$/.idea/backend-pi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mergeFinlPushBackend.iml" filepath="$PROJECT_DIR$/.idea/mergeFinlPushBackend.iml" />
     </modules>
   </component>
 </project>

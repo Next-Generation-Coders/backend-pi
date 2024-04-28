@@ -1141,6 +1141,28 @@ const getMatchesFromGroupsWithMatches = async (req, res) => {
     }
 };
 
+const getMatchesFromGroupsWithMatche = async (req, res) => {
+    try {
+
+        const tournamentId = req.params.id;
+        const tournament = await Tournament.findById(tournamentId);
+
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
+        const gamesByGroup = tournament.groupsWithMatches.map(group => group.matches);
+
+
+
+        res.status(200).json({ gamesByGroup });
+    } catch (error) {
+        console.error('Error fetching matches from groupsWithMatches:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
 async function GetGroupsAndStandings(req,res) {
     try {
 

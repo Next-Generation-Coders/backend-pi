@@ -6,8 +6,7 @@ const User = require('../models/User');
 const Tournament = require('../models/Tournament');
 const Payment = require('../models/Payment');
 const tokenVerif = require("../middlewares/tokenVerification");
-const stripe = require('stripe')('sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUqfXgls0HWLwNFa3ia10KP0VEgBH7lNBzx5QRX0obVbd3tfK9tS6f00vEmRLwkg');
-const stripeWebhookSecret = 'whsec_ns52FHFVwqlgysR3i2omEhpRl8XPUtst';
+const stripe = require('stripe')('sk_test_51PADBEDdlAcY1C7x7jfkFt5YuJGj5jkzBMRf8gFCmtZgEACVgCsBifPwccC27SunDLYP0j01QWSyglu9Erf3xy0d00NxI9iCkV');
 const axios = require('axios');
 
 // Routes pour les paiements
@@ -49,21 +48,20 @@ router.post("/create-checkout-session", async (req, res) => {
     const tndAmount = unitAmount * tndToUsdExchangeRate;
 
     const sessionLineItems = req.body.items.map(tour => {
+      const productImages = tournament.logo ? [tournament.logo] : [];
       return {
         price_data: {
           currency: "usd",
           product_data: {
             name: tour.title,
-            images: [tournament.logo] ,
-            description: `Montant en TND: ${tndAmount /100}`,
-
+            images: productImages,
+            description: `Montant en TND: ${tndAmount / 100}`,
           },
           unit_amount: unitAmount,
         },
         quantity: 1,
       };
     });
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
