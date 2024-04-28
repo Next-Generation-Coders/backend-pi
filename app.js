@@ -11,11 +11,10 @@ const ResultRouter=require("./routes/ResultRoute");
 const Result = require('./models/Result')
 const config = require('./config/dbconfig.json');
 const cookieParser = require('cookie-parser') ;
-const stripe = require("stripe")("sk_test_51Orr3m2MKw3gvn4P2CV9rICMisl4jPIlQmlUqfXgls0HWLwNFa3ia10KP0VEgBH7lNBzx5QRX0obVbd3tfK9tS6f00vEmRLwkg");
-const stripeWebhookSecret = "whsec_DkhMYus3KybNiTsCJ5SlJO3a39ZN0ShO";
+const stripe = require("stripe")("sk_test_51PADBEDdlAcY1C7x7jfkFt5YuJGj5jkzBMRf8gFCmtZgEACVgCsBifPwccC27SunDLYP0j01QWSyglu9Erf3xy0d00NxI9iCkV");
+const stripeWebhookSecret = "whsec_eWN4odNGF2ZyttDMIZS6ciNe51edOOPa";
 const chatController = require('./Controller/ChatController')
 // Middleware
-app.use(Bodyparser.json({ limit: '50mb' }));
 app.use(cors());
 app.use(cookieParser());
 require("dotenv").config();
@@ -30,6 +29,7 @@ app.use(
 );
 
 //morgan
+app.use('/webhook', Bodyparser.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
@@ -72,6 +72,8 @@ const Payment = require("./models/Payment");
 app.use("/api", ComplaintRouter);
 
 
+
+// Webhook Stripe
 app.post('/webhook', async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;

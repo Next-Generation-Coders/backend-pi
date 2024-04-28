@@ -184,6 +184,28 @@ router.get('/teams/:matchId', async (req, res) => {
   }
 });
 
+router.get('/resultMatch/:matchId', async (req, res) => {
+  const matchId = req.params.matchId; // Extract matchId from request parameters
+
+  try {
+    const result = await getResultByMatchId(matchId); // Call the function to get the result by match ID
+    res.json(result); // Send the result as JSON response
+  } catch (error) {
+    console.error('Error fetching result:', error);
+    res.status(500).json({ error: 'Failed to fetch result' }); // Send error response if fetching fails
+  }
+});
+
+// Function to get result by match ID
+async function getResultByMatchId(matchId) {
+  try {
+    const result = await Result.findOne({ match: matchId }).populate('match');
+    return result;
+  } catch (error) {
+    console.error('Error fetching result:', error);
+    throw error; // Propagate the error back to the caller
+  }
+}
 
 module.exports = router;
 

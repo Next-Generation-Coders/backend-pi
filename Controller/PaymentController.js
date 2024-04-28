@@ -1,8 +1,8 @@
 const Payment = require("../models/Payment");
 require('dotenv').config();
 //twilio
-const accountSid=process.env.TWILIOID
-const authToken='ec332010f5f4256f8d55247cd9e299ef'
+const accountSid='AC83721a0df1ccea065310838b63c88746';
+const authToken='4937095e33a70e89975c924399c78a1b'
 const client =require('twilio')(accountSid,authToken);
 
 
@@ -18,7 +18,6 @@ exports.getAllPayments = async (req, res) => {
 }
 
 
-// Fonction pour récupérer un paiement par son identifiant
 exports.getPaymentById = async (req, res) => {
     try {
         const payment = await Payment.findById(req.params.id);
