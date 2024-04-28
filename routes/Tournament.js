@@ -71,6 +71,12 @@ router.get("/getTournamentBymatch/:matchID", TournamentControlle.getTournamentby
 
 router.get("/getTeamsOftournament/:id" , TournamentControlle.getTeamsOftournament);
 
+router.get("/getPublicAndActiveTournaments" , TournamentControlle.getallPublicAndActive);
+
+router.get("/getTopRatedTournaments" , TournamentControlle.getTopRatedTournaments);
+
+router.get("/getTopFollowedTournaments" , TournamentControlle.getTopFollowedTournaments);
+
 
 module.exports = router;
 

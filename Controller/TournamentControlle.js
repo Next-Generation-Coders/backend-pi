@@ -1309,6 +1309,63 @@ async function getTournamentsByUserIdForAdem(req, res) {
     }
 }
 
+
+
+async function getallPublicAndActive(req, res) {
+    try {
+        const data = await Tournament.find({
+            TournamentStatus: "OnGoing", 
+            access: "Public" 
+        });
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+async function getTopRatedTournaments(req, res) {
+    try {
+        const data = await Tournament.find()
+            .sort({ 'rating.5 stars': -1 }) // Sort by the highest rating
+            .limit(7); // Limit the result to 7 documents
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
+
+async function getTopFollowedTournaments(req, res) {
+    try {
+        const data = await Tournament.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "followers",
+                    foreignField: "_id",
+                    as: "followers"
+                }
+            },
+            {
+                $project: {
+                    title: 1,
+                    logo: 1,
+                    numberOfFollowers: { $size: "$followers" }
+                }
+            },
+            {
+                $sort: { numberOfFollowers: -1 }
+            },
+            {
+                $limit: 7
+            }
+        ]);
+        res.status(200).send(data);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
+
 module.exports={
     add,
     getall,
@@ -1342,5 +1399,8 @@ module.exports={
     getMatchesFromGroupsWithMatchesByday,
     getTournamentbyMatch,
     getTeamsOftournament,
-    getTournamentsByUserIdForAdem
+    getTournamentsByUserIdForAdem,
+    getTopFollowedTournaments,
+    getTopRatedTournaments,
+    getallPublicAndActive,
 }
