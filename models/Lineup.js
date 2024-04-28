@@ -12,7 +12,7 @@ const LineupSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team'
     },
-    matches: {
+    matche: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'match'
     },
