@@ -1,11 +1,11 @@
 const express=require("express")
 const router=express.Router()
-const TournamentControlle=require('../Controller/TournamentControlle')
+const TournamentControlle=require('../Controller/UnitTestsTournamentController')
 const tokenVerif = require('../middlewares/tokenVerification')
 const upload = require('../config/multer_tournament')
 
 
-router.post('/add',tokenVerif.requireAuth,upload.single("logo"),TournamentControlle.add);
+
 
 router.get('/getall',TournamentControlle.getall);
 

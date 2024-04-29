@@ -1,5 +1,5 @@
 const express = require('express');
-const TournamentRouter = require('../routes/Tournament');
+const TournamentRouter = require('../routes/TournamentRoutesForUnitTests');
 const StandingsRouter = require ('../routes/StandingsRouter');
 const StadiumRouter = require('../routes/Stadium');
 const request = require('supertest');
@@ -62,7 +62,7 @@ describe('GET /Tournament/getbyname/:name', () => {
 describe('GET /Tournament/fixtures/:id', () => {
   it('should get fixtures by tournament id for league tournament type', async () => {
     const response = await request(app)
-      .get('/Tournament/fixtures/65fb933aaa2b8bc81f3289e8');
+      .get('/Tournament/fixtures/662237ec10aec36261915caf');
     console.log(response.statusCode);
     expect(response.statusCode).to.equal(200);
   }).timeout(30000);
@@ -181,7 +181,7 @@ describe('PUT /Tournament/addRate/:id', () => {
   it('should add a rating to the tournament given its id ', async () => {
     const rate = {"rate" : 5};
     const response = await request(app)
-      .put('/Tournament/addRate/65fb933aaa2b8bc81f3289e8')
+      .put('/Tournament/addRate/662237ec10aec36261915caf')
       .send({"rate"  : 5})
       .set('Accept', 'application/json');
     console.log(response.statusCode);
@@ -203,7 +203,7 @@ describe('PUT /Tournament/follow/:id', () => {
       { expiresIn: '5m' }
   );
     const response = await request(app)
-      .put('/Tournament/follow/65fb933aaa2b8bc81f3289e8')
+      .put('/Tournament/follow/662237ec10aec36261915caf')
       .set('authorization', `Bearer ${accessToken}`);
     console.log(response.statusCode);
     expect(response.statusCode).to.equal(200);
@@ -233,7 +233,7 @@ describe('POST /Stadium/add', () => {
 describe('GET /Tournament/getRefereesAndStadiumsForTournament/:id', () => {
   it('should refs and stadiums of the tournament given its id', async () => {
     const response = await request(app)
-      .get('/Tournament/getRefereesAndStadiumsForTournament/65fb933aaa2b8bc81f3289e8');
+      .get('/Tournament/getRefereesAndStadiumsForTournament/662237ec10aec36261915caf');
     console.log(response.statusCode);
     expect(response.statusCode).to.equal(200);
   }).timeout(30000);

@@ -13,29 +13,7 @@ const ResultController=require('../Controller/ResultController');
 const Result = require('../models/Result.js');
 const StadiumModel = require('../models/Stadium.js')
 
-async function add(req, res) {
 
-    const user = req.user;
-    const Data = req.body;
-    try {
-        const tournamentData = { ...req.body, user: user.id };
-
-        if (req.body.logo) {
-            const base64Image = req.body.logo.split(';base64,').pop();
-            const filename = 'tournament_' + Date.now() + '.png';
-            const filePath = path.join(__dirname, '..', 'uploads', 'tournament', filename);
-            fs.writeFileSync(filePath, base64Image, { encoding: 'base64' });
-
-            tournamentData.logo = 'http://localhost:3000/uploads/tournament/' + filename;
-        }
-        const tournament = new Tournament(tournamentData);
-        await tournament.save();
-        res.status(201).json({ tournamentId: tournament._id });
-    } catch (err) {
-        res.status(400).json({ error: err });
-        console.log(err.message);
-    }
-}
 
 async function getall (req,res){
     try{
@@ -1367,7 +1345,6 @@ async function getTopFollowedTournaments(req, res) {
 
 
 module.exports={
-    add,
     getall,
     getbyid,
     getbyname,
