@@ -5,6 +5,7 @@ const Role = require('../models/User');
 const Coach=require('../models/User');
 const Tournament=require('../models/Tournament');
 const Match=require('../models/Match');
+const mailer = require('../config/nodemailer');
 
 const { getPlayersByIds } = require("../Controller/UserController")
 async function add(req, res) {
@@ -116,76 +117,61 @@ async function deleteTeam (req,res){
 async function addPlayerToTeam(req, res) {
     try {
         const coach = await Coach.findById(req.params.id);
-//         if (coach && coach.roles === 'COACH') {
- //            // Check if the player already exists in the database
-            const existingPlayer = await User.findOne({ email: req.body.email });
-            if (existingPlayer) {
-                // Check if the existing player is already part of a team
-                /* const existingTeam = await Team.findOne({ players: existingPlayer._id });
-                if (existingTeam) {
-                    // Remove the player from the existing team
-                    existingTeam.players.pull(existingPlayer._id);
-                    await existingTeam.save();
-                }
-                existingPlayer.currentTeam=coach.currentTeam;
-                existingPlayer.teams.push(coach.currentTeam)
-                await existingPlayer.save();
-                const team = await Team.findOne({ team_manager: coach._id });
-                team.players.push(existingPlayer._id);
-                await team.save(); */
-                existingPlayer.currentTeam=coach.currentTeam;
-                existingPlayer.teams.push(coach.currentTeam)
-                await existingPlayer.save();
-                const team = await Team.findOne({ team_manager: coach._id });
-                team.players.push(existingPlayer._id);
-                await team.save();
-                
-                req.body.roles = [10, 11];
-                const player = await User.findByIdAndUpdate(existingPlayer._id, req.body);
-                player.roles=[10,11]  ;
-                await player.save();
-                return res.status(200).json({ message: 'Player updtated successfully' });
-            } else {
-                // Create a new player if they don't exist
-                const player = new User(req.body);
-                //console.log(player)
-                player.roles=[10,11] 
-                /* -------------------------------
-                
-                player.currentTeam=coach.currentTeam
-                player.teams.push(coach.currentTeam) 
-                
-                */
-                //console.log(player+"\n"+player.roles)
-                await player.save();
-                //existingPlayer = player;
-                /* 
-                
-                const team = await Team.findOne({ team_manager: coach._id });
-                team.players.push(player._id);
-                await team.save(); 
-                
-                -------------------------------
-                */
+        const existingPlayer = await User.findOne({ email: req.body.email });
+        if (existingPlayer) {
+
+            existingPlayer.currentTeam=coach.currentTeam;
+            existingPlayer.teams.push(coach.currentTeam)
+            await existingPlayer.save();
+            const team = await Team.findOne({ team_manager: coach._id });
+            team.players.push(existingPlayer._id);
+            await team.save();
+
+            req.body.roles = [10, 11];
+            const player = await User.findByIdAndUpdate(existingPlayer._id, req.body);
+            player.roles=[10,11]  ;
+            await player.save();
+            return res.status(200).json({ message: 'Player updtated successfully' });
+        } else {
+            const player = await User.signupPlayer(
+                req.body.email,
+                req.body.password,
+                req.body.phone,
+                req.body.fullname,
+                req.body.age,
+                req.body.position,
+                req.body.jersyNumber,
+                req.body.country,
+                req.body.preferedFoot,
+                req.body.height
+            );
+            if(player){
+                await mailer.sendMail({
+                    from: 'ygharrad@gmail.com',
+                    to: req.body.email,
+                    subject: "LinkUpTournament",
+                    text: `Welcome New Player,
+            
+            You have been added by ${coach.fullname} to the LinkUpTournament platform. Below are your account details:
+            
+            Email: ${req.body.email}
+            Password: ${req.body.password}
+            
+            Please keep your password secure and do not share it with anyone. You can use this password to log in to your account and access the platform.
+            
+            If you have any questions or need assistance, feel free to contact us.
+            
+            Best regards,
+            The LinkUpTournament Team`, // plain text body
+                });
             }
-
-            // Find the team associated with the coach
-        //const team = await Team.findOne({ coach: coach._id });
-
-        //console.log("coach._id : "+coach._id+"\nteam :\n"+team)
-
-            // Add the new player's ID to the team's players array
-        //team.players.push(player._id);
-        
-            // Save the updated team to the database
-        //await team.save();
-
+            await player.save();
+        }
         return res.status(200).json({ message: 'Player added to the team successfully' });
     } catch (err) {
         return res.status(400).json({ error: err.message });
     }
 }
-
 
 
 async function checkTeam_manager(req, res) {

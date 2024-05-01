@@ -160,17 +160,18 @@ User.statics.signup = async function(email, password,phone,fullname,age) {
 }
 
 
-User.statics.signupPlayer = async function(email, password,phone,fullname,age,position,jerseyNumber) {
+User.statics.signupPlayer = async function(email, password, phone, fullname, age, position, jersyNumber, country, preferedFoot, height) {
 
-    if (!email || !password || !phone || !fullname || !age || !position || !jerseyNumber) {
+    const  newPlayerData={ email, password, phone, fullname, age, position, jersyNumber, country, preferedFoot, height } ;
+    if (!email || !password || !phone || !fullname || !age || !position || !jersyNumber) {
         throw Error('All fields must be filled')
     }
     if (!validator.isEmail(email)) {
         throw Error('Email not valid')
     }
-    if (!validator.isStrongPassword(password)) {
+    /* if (!validator.isStrongPassword(password)) {
         throw Error('Password not strong enough')
-    }
+    } */
 
     const exists = await this.findOne({ email })
 
@@ -183,7 +184,19 @@ User.statics.signupPlayer = async function(email, password,phone,fullname,age,po
 
     const rls = [Role.PLAYER,Role.USER];
     const vrf=false;
-    return await this.create({email, password: hash,phone,age,fullname,roles:rls,verified:vrf,jerseyNumber,position})
+    return await this.create({
+        email,
+        password: hash,
+        phone,
+        age,
+        fullname,
+        roles:rls,
+        verified:vrf,
+        jersyNumber,
+        position,
+        country,
+        preferedFoot,
+        height
+    });
 }
-
 module.exports = mongo.model('user',User);

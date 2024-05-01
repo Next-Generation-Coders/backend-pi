@@ -125,8 +125,34 @@ async function generateRoundRobinSchedule(req, res) {
                     round: round,
                     tournament: req.params.id
                 });
+
+
+
+
+                //const result=new Result({
+                  //  match:match_id,
+                    //team1Goals:[0],
+                    //team2Goals:[0]
+                //})
+                //await result.save();
+
                 roundSchedule.push(match);
                 await match.save();
+
+                try {
+
+                    const result = new Result({ match: match._id, team1Goals:0, team2Goals:0, team1Red:0, team2Red:0,team1Yellow:0,team2Yellow:0,team1Corners:0,team2Corners:0,team1Offsides:0,
+                        team2Offsides:0})
+
+                    await result.save();
+
+                    res.status(201).json(result);
+                } catch (error) {
+                    res.status(500).json({ error: error.message });
+                }
+
+
+
             }
             schedule.push(roundSchedule);
 
@@ -356,32 +382,52 @@ const KnockoutTournamentBuild = async (req, res) => {
     try {
         const tournamentId = req.params.id;
         const tournament = await Tournament.findById(tournamentId);
+
         if (!tournament) {
-            throw new Error('Tournament not found');
+            return res.status(404).json({ error: 'Tournament not found' });
         }
+
         if (tournament.TournamentType !== 'Knockout') {
-            throw new Error('Tournament is not of type Knockout');
+            return res.status(400).json({ error: 'Tournament is not of type Knockout' });
         }
 
         const teams = tournament.teams;
 
         if (teams.length < 2 || !Number.isInteger(Math.log2(teams.length))) {
-            throw new Error('Number of teams must be a power of 2 and at least 2');
+            return res.status(400).json({ error: 'Number of teams must be a power of 2 and at least 2' });
         }
 
         shuffleArray(teams);
 
         const fixtures = [];
+        const createdResults = [];
 
         const numMatches = teams.length / 2;
+
         for (let i = 0; i < numMatches; i++) {
             const match = new Match({
-                team1: teams [i * 2],
-                team2:  teams[i * 2 + 1],
+                team1: teams[i * 2],
+                team2: teams[i * 2 + 1],
                 tournament: tournamentId
             });
             await match.save();
             fixtures.push(match);
+
+            const result = new Result({
+                match: match._id,
+                team1Goals: 0,
+                team2Goals: 0,
+                team1Red: 0,
+                team2Red: 0,
+                team1Yellow: 0,
+                team2Yellow: 0,
+                team1Corners: 0,
+                team2Corners: 0,
+                team1Offsides: 0,
+                team2Offsides: 0
+            });
+            await result.save();
+            createdResults.push(result);
         }
 
         const initialRound = {
@@ -390,42 +436,37 @@ const KnockoutTournamentBuild = async (req, res) => {
         };
 
         const rounds = [initialRound];
-
         const numRounds = Math.log2(teams.length);
 
         for (let i = 2; i <= numRounds; i++) {
             const numMatches = teams.length / Math.pow(2, i);
-            const fixtures = [];
+            const roundFixtures = [];
 
             for (let j = 0; j < numMatches; j++) {
                 const match = new Match({
                     tournament: tournamentId,
-                    team1 : null ,
-                    team2 : null,
+                    team1: null,
+                    team2: null,
                 });
-                await MatchController.saveMatch(match);
-                console.log("m atch ",match);
-                fixtures.push(match);
-                console.log("this the match id " , match._id);
-                console.log("fixtures saved ",fixtures)
-
+                await match.save();
+                roundFixtures.push(match);
             }
 
             const round = {
                 title: `Round ${i}`,
-                fixtures: fixtures
+                fixtures: roundFixtures
             };
-            console.log("round 2 " , round)
+
             rounds.push(round);
         }
 
-
         await Tournament.findByIdAndUpdate(
-            req.params.id,
+            tournamentId,
             { rounds: rounds },
             { new: true }
         );
-        res.status(200).json({ rounds });
+
+        res.status(200).json({ rounds, createdResults });
     } catch (error) {
         console.error('Error creating knockout fixtures:', error);
         res.status(500).json({ error: 'Internal server error' });

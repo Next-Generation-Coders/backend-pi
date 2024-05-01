@@ -111,7 +111,7 @@ router.get('/resultsSorted', async (req, res) => {
     const currentDate = new Date();
 
     // Find the results
-    const results = await Result.find().populate({ 
+    const results = await Result.find().populate({
       path: 'match',
       populate: [
         { path: 'team1', model: 'Team' },
@@ -127,6 +127,8 @@ router.get('/resultsSorted', async (req, res) => {
     const finishedResults = [];
     const upcomingResults = [];
 
+
+
     results.forEach(result => {
       // Ensure result.match exists and is not null
       if (result.match && result.match.date) {
@@ -140,7 +142,7 @@ router.get('/resultsSorted', async (req, res) => {
         } else {
 
 
-        
+
 
           // Match is scheduled for the future
           upcomingResults.push(result);
@@ -157,6 +159,33 @@ router.get('/resultsSorted', async (req, res) => {
   } catch (error) {
     console.error('Error fetching results:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+router.get('/upcomingMatchesWithResults', async (req, res) => {
+  try {
+    const today = new Date();
+
+    const upcomingMatches = await Match.find({ date: { $gt: today } }).exec();
+
+    const populatedMatches = await Promise.all(upcomingMatches.map(async match => {
+      const result = await Result.findOne({ match: match._id }).exec();
+
+      if (!result) {
+        return { match, result: null };
+      }
+
+      const { team1Goals, team2Goals } = result;
+
+      return { match, result: { team1Goals, team2Goals } };
+    }));
+
+    res.status(200).json(populatedMatches);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des matchs à venir avec les résultats :', error);
+    res.status(500).json({ message: 'Erreur lors de la récupération des matchs à venir avec les résultats.' });
   }
 });
 
