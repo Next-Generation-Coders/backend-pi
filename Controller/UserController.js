@@ -558,7 +558,7 @@ async function getTeamsByTournament(req,res){
                     try {
                         const team = await Team.findById(t);
                         if (team) {
-                            if(user?.currentTeam.equals(t)){
+                            if(user.currentTeam.equals(t)){
                                 myTeam = team;
                                 teams.push(team)
                             }else{
