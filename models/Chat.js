@@ -11,7 +11,7 @@ const chatSchema = new mongoose.Schema({
         senderEmail: { type: String},
         message: { type: String, required: true },
         timestamp: { type: Date, default: Date.now },
-        avatar:{type:String,default:"http://localhost:3000/uploads/avatar/placeholder.webp"}
+        avatar:{type:String,default:"http://197.26.204.208:3000/uploads/avatar/placeholder.webp"}
     }],
     selected:{type:Boolean,default:false}
 });

@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: 197.26.204.208:8083/backend-pipeline_moataz_production-node_app:latest
     ports:
       - "3000:3000"
     volumes:
@@ -18,4 +19,4 @@ services:
       - GOOGLE_CLIENT_ID=657623355311-49dhb3u2i6t8gi1t4ds82rco618roofa.apps.googleusercontent.com
       - GOOGLE_CLIENT_SECRET=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
       - DATABASE_URL="mongodb+srv://admin:lutadmin@lutcluster.hudxy73.mongodb.net/?retryWrites=true&w=majority"
-      - CLIENT_URL="http://localhost:3001/payment"
+      - CLIENT_URL="http://linkuptournament.tn:3001/payment"

@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         registryCredentials = "nexus"
-        registry = "172.17.0.2:8083"
+        registry = "197.26.204.208:8083"
     }
     stages {
         stage('Install dependencies') {
@@ -12,43 +12,42 @@ pipeline {
                 }
             }
         }
-        	stage('Unit Test') {
-                    steps {
-                        script {
-                            sh 'npm run test'
-                        }
+        stage('Unit Test') {
+            steps {
+                script {
+                    sh 'npm run test'
+                }
+            }
+        }
+        stage('Build application') {
+            steps {
+                script {
+                    sh 'npm run build'
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'scanner'
+                    withSonarQubeEnv {
+                        sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
-                stage('SonarQube Analysis') {
-                    steps {
-                        script {
-                            def scannerHome = tool 'scanner'
-                            withSonarQubeEnv {
-                                sh "${scannerHome}/bin/sonar-scanner -X"
-                            }
-                        }
-                    }
+            }
+        }
+        stage('Building image') {
+            steps {
+                script {
+                    sh 'docker-compose build'
                 }
-                stage('Build application') {
-                    steps {
-                        script {
-                            sh 'npm run build'
-                        }
-                    }
-                }
-                stage('Building image') {
-                    steps {
-                        script {
-                            sh('docker-compose build')
-                        }
-                    }
-                }
+            }
+        }
         stage('Deploy to Nexus') {
             steps {
                 script {
-                    docker.withRegistry("http://"+registry, registryCredentials) {
-                        sh "docker tag backed-pipe_main_node_app:latest $registry/backed-pipe_main_node_app:latest"
-                        sh('docker push $registry/backed-pipe_main_node_app:latest')
+                    docker.withRegistry("http://" + registry, registryCredentials) {
+                        sh 'docker push $registry/backend-pipeline_moataz_production-node_app:latest'
                     }
                 }
             }
@@ -57,23 +56,9 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://" + registry, registryCredentials) {
-                        sh('docker pull $registry/backed-pipe_main_node_app:latest')
-                        sh('docker-compose up -d')
+                        sh 'docker pull $registry/backend-pipeline_moataz_production-node_app:latest'
+                        sh 'docker-compose up -d'
                     }
-                }
-            }
-        }
-        stage('Run Prometheus') {
-            steps {
-                script {
-                    sh('docker start prometheus')
-                }
-            }
-        }
-        stage('Run Grafana') {
-            steps {
-                script {
-                    sh('docker start grafana')
                 }
             }
         }
