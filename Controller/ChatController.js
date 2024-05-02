@@ -8,7 +8,8 @@ async function createNewChat(req,res){
         const chat = req.body;
         console.log(chat);
         chat.owner = user.email;
-        chat.type.toLowerCase() === ('single') ? chat.type = 'Single' : chat.type = 'Group';
+        const type = chat.type;
+        type.toLowerCase() === ('single') ? chat.type = 'Single' : chat.type = 'Group';
         let participantsById = [];
         for (const p of chat.participants) {
             if(p){
@@ -21,6 +22,7 @@ async function createNewChat(req,res){
         const c = await Chat.create(chat);
         res.status(200).json(c);
     }catch(e){
+        console.log(e.message);
         res.status(400).json({error:e.message})
     }
 }
