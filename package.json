@@ -8,6 +8,8 @@
     "build": "webpack --config webpack.config.js --mode development",
     "test": "mocha --require babel-register __tests__/*.js --exit",
     "testAdem": "mocha --require babel-register __tests__/AdemTests.js --exit",
+    "testChouaib": "mocha --require babel-register __tests__/ChouaibTests.js --exit",
+    "testYoussef": "mocha --require babel-register __tests__/YoussefTests.js --exit",
     "dev": "nodemon app.js"
   },
   "author": "nexgencoders",

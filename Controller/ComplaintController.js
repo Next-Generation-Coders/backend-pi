@@ -116,11 +116,34 @@ const deleteComplaint = async (req, res) => {
 };
 
 
+async function getbyid (req,res){
+    try{
+        const data = await Complaint.findById(req.params.id)
+        res.status(200).send(data)
+    }catch(err){
+        res.status(400).json({error:err});
+    }
+
+}
+
+async function getbyname (req,res){
+    try{
+        let title=req.params.nameClass
+        const data = await Complaint.findOne({title});
+        res.status(200).send(data)
+    }catch(err){
+        res.status(400).json({error:err});
+    }
+}
+
 
 module.exports = {
     createComplaint,
     getAllComplaints,
     updateComplaintStatus,
     respondToComplaint,
-    deleteComplaint
+    deleteComplaint,
+    getbyid,
+    getbyname
+
 };
