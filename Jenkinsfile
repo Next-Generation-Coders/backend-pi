@@ -5,44 +5,44 @@ pipeline {
         registry = "197.26.204.208:8083"
     }
     stages {
-//         stage('Install dependencies') {
-//             steps {
-//                 script {
-//                     sh 'npm install --force'
-//                 }
-//             }
-//         }
-//         stage('Unit Test') {
-//             steps {
-//                 script {
-//                     sh 'npm run test'
-//                 }
-//             }
-//         }
-//         stage('Build application') {
-//             steps {
-//                 script {
-//                     sh 'npm run build'
-//                 }
-//             }
-//         }
-//         stage('SonarQube Analysis') {
-//             steps {
-//                 script {
-//                     def scannerHome = tool 'scanner'
-//                     withSonarQubeEnv {
-//                         sh "${scannerHome}/bin/sonar-scanner"
-//                     }
-//                 }
-//             }
-//         }
-//         stage('Building image') {
-//             steps {
-//                 script {
-//                     sh 'docker-compose build'
-//                 }
-//             }
-//         }
+        stage('Install dependencies') {
+            steps {
+                script {
+                    sh 'npm install --force'
+                }
+            }
+        }
+        stage('Unit Test') {
+            steps {
+                script {
+                    sh 'npm run test'
+                }
+            }
+        }
+        stage('Build application') {
+            steps {
+                script {
+                    sh 'npm run build'
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'scanner'
+                    withSonarQubeEnv {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+        stage('Building image') {
+            steps {
+                script {
+                    sh 'docker-compose build'
+                }
+            }
+        }
         stage('Deploy to Nexus') {
             steps {
                 script {
@@ -62,6 +62,19 @@ pipeline {
                 }
             }
         }
-
+        stage('Run Prometheus') {
+            steps {
+                script {
+                        sh 'docker start prometheus'
+                }
+            }
+        }
+        stage('Run Grafana') {
+            steps {
+                script {
+                        sh 'docker start grafana'
+                }
+            }
+        }
     }
 }
