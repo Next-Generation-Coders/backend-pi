@@ -2,7 +2,7 @@ const Payment = require("../models/Payment");
 require('dotenv').config();
 //twilio
 const accountSid='AC83721a0df1ccea065310838b63c88746';
-const authToken='4937095e33a70e89975c924399c78a1b'
+const authToken='60754c760e5b63e5b18994337ffcf852'
 const client =require('twilio')(accountSid,authToken);
 
 //final push

@@ -77,13 +77,11 @@ app.use("/api", ComplaintRouter);
 app.post('/webhook', async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
-
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, stripeWebhookSecret);
     } catch (err) {
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
-
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         const Created = session.created;
