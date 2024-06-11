@@ -11,7 +11,7 @@ async function add(req, res) {
         const team = new Team();
         console.log("\n testtss ..........."+req.file.filename +"\n")
         team.name = req.body.name;
-        team.logo = "http://localhost:3000/uploads/team/"+req.file.filename ;
+        team.logo = "https://lutback.azurewebsites.net/uploads/team/"+req.file.filename ;
         team.players =  [];
         //team.coach = req.params.id;
         team.team_manager = req.params.id;

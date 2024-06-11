@@ -14,7 +14,7 @@ async function add(req, res) {
         const team = new Team();
         console.log("\n testtss ..........."+req.file.filename +"\n")
         team.name = req.body.name;
-        team.logo = "http://localhost:3000/uploads/team/"+req.file.filename ;
+        team.logo = "https://lutback.azurewebsites.net/uploads/team/"+req.file.filename ;
         team.players =  [];
         //team.coach = req.params.id;
         team.team_manager = req.params.id;
@@ -266,7 +266,7 @@ async function getTeamRating(req, res) {
         if (team.players && team.players.length > 0) {
             // Fetch player objects based on their IDs
             const playerPromises = team.players.map(async playerId => {
-                const playerResponse = await fetch(`http://localhost:3000/User/getbyid/${playerId}`);
+                const playerResponse = await fetch(`https://lutback.azurewebsites.net/User/getbyid/${playerId}`);
                 return playerResponse.json();
             });
         

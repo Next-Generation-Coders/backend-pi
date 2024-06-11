@@ -26,7 +26,7 @@ async function add(req, res) {
             const filePath = path.join(__dirname, '..', 'uploads', 'tournament', filename);
             fs.writeFileSync(filePath, base64Image, { encoding: 'base64' });
 
-            tournamentData.logo = 'http://localhost:3000/uploads/tournament/' + filename;
+            tournamentData.logo = 'https://lutback.azurewebsites.net/uploads/tournament/' + filename;
         }
         const tournament = new Tournament(tournamentData);
         await tournament.save();
