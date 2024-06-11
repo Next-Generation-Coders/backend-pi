@@ -12,6 +12,7 @@ const Standing = require('../models/Standings');
 const ResultController=require('../Controller/ResultController');
 const Result = require('../models/Result.js');
 const StadiumModel = require('../models/Stadium.js')
+const Payment = require("../models/Payment");
 
 async function add(req, res) {
 
@@ -1407,6 +1408,33 @@ async function getTopFollowedTournaments(req, res) {
 }
 
 
+async function IsPaid(req, res) {
+    try {
+        const tournamentId = req.params.id;
+        const tournament = await Tournament.findById(tournamentId);
+
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
+        const payment = await Payment.findOne({ tournament: tournamentId });
+
+        if (!payment) {
+            return res.status(404).json({ error: 'Payment not found' });
+        }
+
+        if (payment.payment_status === "paid") {
+            return res.status(200).json({ isPaid: true });
+        }
+
+        return res.status(200).json({ isPaid: false });
+
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
+    }
+}
+
+
 module.exports={
     add,
     getall,
@@ -1444,4 +1472,5 @@ module.exports={
     getTopFollowedTournaments,
     getTopRatedTournaments,
     getallPublicAndActive,
+    IsPaid,
 }

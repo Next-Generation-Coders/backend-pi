@@ -77,6 +77,7 @@ router.get("/getTopRatedTournaments" , TournamentControlle.getTopRatedTournament
 
 router.get("/getTopFollowedTournaments" , TournamentControlle.getTopFollowedTournaments);
 
+router.get("/IsPaid/:id" , TournamentControlle.IsPaid);
 
 module.exports = router;
 
