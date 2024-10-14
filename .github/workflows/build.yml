@@ -24,7 +24,7 @@ jobs:
       
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm install --force
       
       # Step 4: Run tests (to generate test results and coverage report)
       - name: Run tests
