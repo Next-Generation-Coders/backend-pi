@@ -200,7 +200,7 @@ async function generateDoubleLegSchedule(req, res) {
                 const roundSchedule = [];
                 for (let i = 0; i < halfNumTeams; i++) {
                     let team1, team2;
-                    if (leg === 1) {
+                    if (leg == 1) {
                         team1 = teams[i];
                         team2 = teams[numTeams - 1 - i];
                     } else {
@@ -269,7 +269,7 @@ async function generateLeagueMatchFixtures (req,res)  {
         const tournament = await Tournament.findById(req.params.id).populate('teams');
 
 
-        if ( 'League'===tournament.TournamentType ) {
+        if ( 'League'==tournament.TournamentType ) {
 
             const teams = tournament.teams;
 
@@ -550,7 +550,7 @@ async function createChampionshipGroupsAndMatches(req, res) {
         if (!tournament) {
             throw new Error('Tournament not found');
         }
-        if ('Championship' === tournament.TournamentType) {
+        if ('Championship' == tournament.TournamentType) {
             const teams = tournament.teams;
 
             if (teams.length < 4 || teams.length % 4 !== 0) {
@@ -685,7 +685,7 @@ async function addRateToTournament(req, res) {
             return res.status(400).json({ error: 'Invalid rate. Rate must be between 1 and 5' });
         }
 
-        const key = rate === 1 ? '1 star' : `${rate} stars`;
+        const key = rate == 1 ? '1 star' : `${rate} stars`;
         const ratingTable = tournament.rating ;
         ratingTable[key] = ratingTable[key] + 1 ;
         await Tournament.findByIdAndUpdate(
@@ -831,7 +831,7 @@ async function KnockoutUpdateTournamentRounds(req, res) {
         if (!TheMatchToBeUpdated) {
             return res.status(404).json({ error: 'Match not found for next round fixture' });
         }
-        if (matchIndex % 2 === 0) {
+        if (matchIndex % 2 == 0) {
             TheMatchToBeUpdated.team1 = winner.winner;
         } else {
             TheMatchToBeUpdated.team2 = winner.winner;
@@ -1028,7 +1028,7 @@ async function UpdateGroupStandingAfterMatch(req, res) {
         const winner = await ResultController.getMatchWinner(matchId);
 
         if (winner) {
-            if (winner === team1) {
+            if (winner == team1) {
                 team1Standing.wins += 1;
                 team1Standing.points += 3;
                 team2Standing.losses += 1;
@@ -1423,7 +1423,7 @@ async function IsPaid(req, res) {
             return res.status(404).json({ error: 'Payment not found' });
         }
 
-        if (payment.payment_status === "paid") {
+        if (payment.payment_status == "paid") {
             return res.status(200).json({ isPaid: true });
         }
 
