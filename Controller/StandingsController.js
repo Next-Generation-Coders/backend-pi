@@ -89,7 +89,7 @@ const getStandingsById = async (req, res) => {
         const result = await ResultController.getResultByMatch(matchId);
         const winner = await ResultController.getMatchWinner(matchId);
 
-        if (!tournament || !result || winner === null) {
+        if (!tournament || !result || winner == null) {
             return res.status(404).json({ error: 'Invalid tournament or match result' });
         }
 
@@ -110,7 +110,7 @@ const getStandingsById = async (req, res) => {
 
      
         if (winner) {
-            if (winner === team1) {
+            if (winner == team1) {
        
                 team1Standing.wins += 1;
                 team1Standing.points += 3;
